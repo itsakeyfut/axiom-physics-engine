@@ -176,12 +176,12 @@ install(FILES
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/axiom
 )
 
-# Export targets
-install(EXPORT axiomTargets
-    FILE axiomTargets.cmake
-    NAMESPACE axiom::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/axiom
-)
+# Export targets (will be enabled when library targets are added)
+# install(EXPORT axiomTargets
+#     FILE axiomTargets.cmake
+#     NAMESPACE axiom::
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/axiom
+# )
 
 # Print configuration summary
 message(STATUS "")
