@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "axiom",
+  "version": "0.1.0",
+  "description": "Next-generation realistic physics engine with C++20 and Vulkan",
+  "homepage": "https://github.com/itsakeyfut/axiom",
+  "license": "Apache-2.0",
+  "dependencies": [
+    {
+      "name": "glm",
+      "version>=": "1.0.0"
+    },
+    {
+      "name": "spdlog",
+      "version>=": "1.12.0"
+    },
+    {
+      "name": "gtest",
+      "version>=": "1.14.0"
+    },
+    {
+      "name": "benchmark",
+      "version>=": "1.8.0"
+    }
+  ],
+  "features": {
+    "tracy": {
+      "description": "Tracy profiler support for performance analysis",
+      "dependencies": [
+        "tracy"
+      ]
+    },
+    "vulkan": {
+      "description": "Vulkan GPU compute support (future phase)",
+      "dependencies": [
+        "vulkan",
+        "vulkan-memory-allocator"
+      ]
+    },
+    "rendering": {
+      "description": "Rendering support for visualization (future phase)",
+      "dependencies": [
+        "glfw3",
+        "imgui"
+      ]
+    }
+  },
+  "builtin-baseline": "latest"
+}
