@@ -1,0 +1,179 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+title: "[Feature]: "
+labels: ["enhancement"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature! Please provide comprehensive information to help us evaluate and implement it.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A concise description of the feature in 1-2 sentences.
+      placeholder: Add support for continuous collision detection (CCD) for fast-moving objects to prevent tunneling.
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this feature needed? What problem does it solve? What value does it provide?
+      placeholder: |
+        Currently, fast-moving objects can tunnel through thin obstacles due to discrete collision detection.
+        This makes it difficult to:
+        - Simulate high-velocity projectiles (bullets, arrows)
+        - Handle fast-moving vehicles without tunneling
+        - Create reliable collision responses for extreme scenarios
+
+        CCD would significantly improve physical accuracy and simulation reliability.
+    validations:
+      required: true
+
+  - type: textarea
+    id: detailed_description
+    attributes:
+      label: Detailed Description
+      description: Provide a comprehensive explanation of the feature, including behavior, functionality, and edge cases.
+      placeholder: |
+        The CCD feature should:
+        1. Use swept collision detection (GJK or conservative advancement)
+        2. Detect time of impact (TOI) for fast-moving objects
+        3. Support all primitive shapes (sphere, box, capsule, convex hull)
+        4. Integrate with existing broad-phase (BVH)
+        5. Be optional per rigid body (performance consideration)
+
+        Edge cases to handle:
+        - What happens when multiple collisions occur in one timestep?
+        - How to handle CCD vs non-CCD object interactions?
+        - Performance degradation with many CCD-enabled objects
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: How do you envision this being implemented? Include technical details if possible.
+      placeholder: |
+        1. Add a `ContinuousCollisionDetection` class in `axiom/collision/ccd.hpp`
+        2. Implement swept collision algorithms:
+           - GJK-based swept collision for convex shapes
+           - Conservative advancement for TOI calculation
+           - Integration with existing GJK/EPA solver
+        3. Extend `RigidBody` class with CCD flag and velocity threshold
+        4. Modify broad-phase to identify CCD candidates
+        5. Add substep subdivision for CCD resolution
+        6. Create unit tests for tunneling prevention
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: What other approaches have you considered? What are their pros and cons?
+      placeholder: |
+        Alternative 1: Increase timestep subdivision globally
+        - Pro: Simpler implementation, catches all collisions
+        - Con: Significantly impacts performance for all objects
+
+        Alternative 2: Use speculative contacts
+        - Pro: Cheaper than full CCD, works for many cases
+        - Con: May miss some edge cases, less accurate
+
+        Alternative 3: Implement ray-based CCD only
+        - Pro: Fast for bullet-like objects
+        - Con: Doesn't handle rotating objects or large shapes well
+
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Trade-offs
+      description: What are the potential downsides or costs of this feature?
+      placeholder: |
+        - Performance: CCD is computationally expensive (may add 2-5ms per frame)
+        - Complexity: Adds significant algorithmic complexity to collision pipeline
+        - Memory: Additional storage for swept volume and TOI calculations
+        - Testing: Requires extensive testing with edge cases and corner scenarios
+        - Integration: May conflict with existing optimization strategies (spatial hashing, sleeping)
+
+  - type: textarea
+    id: success_criteria
+    attributes:
+      label: Success Criteria
+      description: How will we know this feature is successfully implemented? What should it achieve?
+      placeholder: |
+        The feature is successful when:
+        - [ ] No tunneling occurs for objects moving up to 100 m/s
+        - [ ] CCD overhead is <1ms per frame with 100 CCD-enabled bodies
+        - [ ] Supports all primitive shapes (sphere, box, capsule, convex hull)
+        - [ ] Integrates seamlessly with existing collision pipeline
+        - [ ] Clear API for enabling/disabling CCD per body
+        - [ ] Performance benchmarks show acceptable overhead
+        - [ ] Unit tests cover edge cases (rotation, multiple collisions)
+        - [ ] Documentation includes CCD algorithm description and usage guide
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples / References
+      description: Are there examples from other projects or references that demonstrate this feature?
+      placeholder: |
+        - Bullet Physics: Conservative advancement CCD implementation
+        - PhysX: Swept collision detection with TOI calculation
+        - Box2D: Continuous collision for 2D (reference for concepts)
+        - Reference: "Real-Time Collision Detection" by Christer Ericson, Chapter 5
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would improve workflow
+        - High - Critical for my use case
+      default: 0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      description: How complex do you think this feature is to implement?
+      options:
+        - Low - Simple change
+        - Medium - Moderate effort
+        - High - Significant undertaking
+        - Unknown
+      default: 3
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to help implement this feature
+          required: false
+        - label: I can provide test cases or examples
+          required: false
+        - label: I can help with documentation
+          required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following before submitting.
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have provided detailed information above
+          required: true
+        - label: This feature aligns with the project's goals
+          required: false

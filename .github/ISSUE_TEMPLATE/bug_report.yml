@@ -1,0 +1,141 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please provide detailed information to help us understand and fix the issue.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A concise description of the bug in 1-2 sentences.
+      placeholder: The physics simulation crashes when adding more than 1000 rigid bodies to the world.
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current Behavior
+      description: What is currently happening? Be specific and detailed.
+      placeholder: |
+        When attempting to add the 1001st rigid body to PhysicsWorld, the simulation
+        crashes with an access violation. No error message is displayed before the crash.
+        The application terminates immediately.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: What should happen instead?
+      placeholder: |
+        The physics world should successfully add the rigid body and continue simulation,
+        or return a clear error code if the maximum body count is reached.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the bug. Include commands, file paths, and configurations.
+      placeholder: |
+        1. Build the project: `cmake --preset windows-release && cmake --build build/windows-release`
+        2. Create a test program that adds 1001 rigid bodies in a loop
+        3. Run: `./build/windows-release/bin/test_program.exe`
+        4. Observe the access violation crash
+    validations:
+      required: true
+
+  - type: textarea
+    id: root_cause
+    attributes:
+      label: Root Cause (if known)
+      description: If you have investigated the issue, describe what you believe is causing it.
+      placeholder: |
+        The BVH tree in `axiom/collision/bvh.cpp:256` uses a fixed array size of 1000 nodes,
+        but the body addition function doesn't check capacity before inserting new nodes.
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution (optional)
+      description: If you have ideas on how to fix this, please share them.
+      placeholder: |
+        1. Add capacity check before inserting nodes into BVH
+        2. Increase the maximum node count to 10000
+        3. Implement dynamic memory allocation using std::vector
+
+  - type: textarea
+    id: error_output
+    attributes:
+      label: Error Messages / Stack Trace
+      description: Include any error messages, stack traces, or relevant log output.
+      placeholder: |
+        ```
+        Exception thrown: read access violation.
+        this->nodes_ was 0xCCCCCCCC.
+
+        Stack trace:
+          axiom::collision::BVH::insert(Node*) - bvh.cpp:256
+          axiom::dynamics::PhysicsWorld::addBody(RigidBody*) - physics_world.cpp:142
+          main() - main.cpp:28
+        ```
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version are you using? (commit hash or tag)
+      placeholder: v0.1.0 or commit 96a4edc
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide detailed environment information.
+      placeholder: |
+        - OS: Windows 11 (Build 26200)
+        - Compiler: MSVC 19.42 / GCC 13.2 / Clang 18.0
+        - CMake Version: 3.28.0
+        - Architecture: x86_64
+        - Build Type: Debug / Release / RelWithDebInfo
+        - vcpkg commit: a1b2c3d4
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other context, screenshots, or information that might be helpful.
+      placeholder: |
+        - This issue only occurs when body count exceeds 1000
+        - Workaround: using multiple PhysicsWorld instances works
+        - Related to issue #123
+        - Tracy profiler shows high memory allocation at crash point
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following before submitting.
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have provided all required information above
+          required: true
+        - label: I have tested this on the latest version (if possible)
+          required: false
