@@ -1,19 +1,25 @@
 # Axiom test suite
-# Tests will be added as modules are implemented
 
-message(STATUS "Test directory configured (tests will be added in future phases)")
+# Test executable
+add_executable(axiom_tests
+    math/test_vec.cpp
+)
 
-# Example of how to add tests in the future:
-# add_executable(axiom_tests
-#     math/test_vec3.cpp
-#     math/test_mat4.cpp
-#     # ...
-# )
-# target_link_libraries(axiom_tests
-#     PRIVATE
-#         axiom::core
-#         axiom::math
-#         GTest::gtest
-#         GTest::gtest_main
-# )
-# add_test(NAME axiom_tests COMMAND axiom_tests)
+# Link libraries
+target_link_libraries(axiom_tests
+    PRIVATE
+        axiom::math
+        axiom::core
+        GTest::gtest
+        GTest::gtest_main
+)
+
+# Add test to CTest
+add_test(NAME axiom_tests COMMAND axiom_tests)
+
+# Set test properties
+set_target_properties(axiom_tests PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
+message(STATUS "Axiom tests configured")
