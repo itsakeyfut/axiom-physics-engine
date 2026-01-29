@@ -357,5 +357,5 @@ TEST(VecOpsTest, Round3D) {
     Vec3 result = round(v);
     EXPECT_FLOAT_EQ(result.x, 3.0f);
     EXPECT_FLOAT_EQ(result.y, 4.0f);
-    EXPECT_FLOAT_EQ(result.z, 2.0f);
+    EXPECT_FLOAT_EQ(result.z, 3.0f);  // std::round rounds half away from zero
 }

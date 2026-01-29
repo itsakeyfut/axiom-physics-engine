@@ -28,11 +28,11 @@ public:
 
     /**
      * @brief Construct from x, y, and z components
-     * @param x X component
-     * @param y Y component
-     * @param z Z component
+     * @param inX X component
+     * @param inY Y component
+     * @param inZ Z component
      */
-    constexpr Vec3(float x, float y, float z) noexcept : x(x), y(y), z(z) {}
+    constexpr Vec3(float inX, float inY, float inZ) noexcept : x(inX), y(inY), z(inZ) {}
 
     /**
      * @brief Construct with same value for all components

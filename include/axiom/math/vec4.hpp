@@ -30,12 +30,13 @@ public:
 
     /**
      * @brief Construct from x, y, z, and w components
-     * @param x X component
-     * @param y Y component
-     * @param z Z component
-     * @param w W component
+     * @param inX X component
+     * @param inY Y component
+     * @param inZ Z component
+     * @param inW W component
      */
-    constexpr Vec4(float x, float y, float z, float w) noexcept : x(x), y(y), z(z), w(w) {}
+    constexpr Vec4(float inX, float inY, float inZ, float inW) noexcept
+        : x(inX), y(inY), z(inZ), w(inW) {}
 
     /**
      * @brief Construct with same value for all components

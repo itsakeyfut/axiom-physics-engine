@@ -27,10 +27,10 @@ public:
 
     /**
      * @brief Construct from x and y components
-     * @param x X component
-     * @param y Y component
+     * @param inX X component
+     * @param inY Y component
      */
-    constexpr Vec2(float x, float y) noexcept : x(x), y(y) {}
+    constexpr Vec2(float inX, float inY) noexcept : x(inX), y(inY) {}
 
     /**
      * @brief Construct with same value for all components
