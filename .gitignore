@@ -1,5 +1,64 @@
+# Documentation (temporary - will be added back later)
 docs/
 
+# Build directories
+build/
+install/
+
+# vcpkg installed packages
+vcpkg_installed/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# Compiled Object files
+*.o
+*.obj
+*.lo
+*.slo
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.a
+*.lib
+*.la
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Test results
+Testing/
+*.log
+
+# Profiler data
+*.tracy
+*.pdb
+
+# IDE files
+.idea/
+*.swp
+*~
+
+# Claude Code
 .claude/settings.local.json
 .claude/commands/
 .claude/hooks/

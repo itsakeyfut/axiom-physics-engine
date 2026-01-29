@@ -183,6 +183,25 @@ install(EXPORT axiomTargets
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/axiom
 )
 
+# Generate pkg-config files
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/axiom_core.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/axiom_core.pc
+    @ONLY
+)
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/axiom_math.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/axiom_math.pc
+    @ONLY
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/axiom_core.pc
+    ${CMAKE_CURRENT_BINARY_DIR}/axiom_math.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
+
 # Print configuration summary
 message(STATUS "")
 message(STATUS "Axiom Physics Engine Configuration:")

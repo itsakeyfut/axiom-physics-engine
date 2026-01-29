@@ -154,7 +154,6 @@ PenaltyIndentedWhitespace: 0
 
 # Templates
 AlwaysBreakTemplateDeclarations: Yes
-SpaceAfterTemplateKeyword: true
 
 # Other
 KeepEmptyLinesAtTheStartOfBlocks: false
