@@ -97,12 +97,28 @@ endif()
 if(AXIOM_USE_SIMD)
     add_compile_definitions(AXIOM_USE_SIMD=1)
 
-    if(MSVC)
-        # Enable AVX2 on MSVC
-        add_compile_options(/arch:AVX2)
+    # Detect architecture
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)")
+        # ARM64 architecture - use NEON
+        message(STATUS "SIMD: Using ARM NEON")
+        if(NOT MSVC)
+            # GCC/Clang on ARM
+            add_compile_options(-march=armv8-a)
+        endif()
+        # NEON is enabled by default on ARM64, no additional flags needed
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|x64)")
+        # x86_64 architecture - use AVX2/FMA
+        message(STATUS "SIMD: Using x86_64 AVX2/FMA")
+        if(MSVC)
+            # Enable AVX2 on MSVC
+            add_compile_options(/arch:AVX2)
+        else()
+            # Enable AVX2 on GCC/Clang
+            add_compile_options(-mavx2 -mfma)
+        endif()
     else()
-        # Enable AVX2 on GCC/Clang
-        add_compile_options(-mavx2 -mfma)
+        message(WARNING "SIMD: Unknown architecture ${CMAKE_SYSTEM_PROCESSOR}, SIMD optimizations disabled")
+        set(AXIOM_USE_SIMD OFF)
     endif()
 endif()
 
