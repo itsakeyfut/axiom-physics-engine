@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
-
 #include "axiom/math/vec2.hpp"
 #include "axiom/math/vec3.hpp"
 #include "axiom/math/vec4.hpp"
+
+#include <gtest/gtest.h>
 
 using namespace axiom::math;
 

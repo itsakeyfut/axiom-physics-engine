@@ -54,18 +54,14 @@ public:
      * @param index 0 for x, 1 for y, 2 for z
      * @return Reference to component
      */
-    float& operator[](size_t index) noexcept {
-        return (&x)[index];
-    }
+    float& operator[](size_t index) noexcept { return (&x)[index]; }
 
     /**
      * @brief Const array-style access to components
      * @param index 0 for x, 1 for y, 2 for z
      * @return Const reference to component
      */
-    const float& operator[](size_t index) const noexcept {
-        return (&x)[index];
-    }
+    const float& operator[](size_t index) const noexcept { return (&x)[index]; }
 
     // Arithmetic operators
 
@@ -114,9 +110,7 @@ public:
     /**
      * @brief Unary negation
      */
-    constexpr Vec3 operator-() const noexcept {
-        return Vec3(-x, -y, -z);
-    }
+    constexpr Vec3 operator-() const noexcept { return Vec3(-x, -y, -z); }
 
     // Compound assignment operators
 
@@ -174,9 +168,7 @@ public:
     /**
      * @brief Inequality comparison
      */
-    constexpr bool operator!=(const Vec3& other) const noexcept {
-        return !(*this == other);
-    }
+    constexpr bool operator!=(const Vec3& other) const noexcept { return !(*this == other); }
 
     // Vector operations
 
@@ -195,28 +187,21 @@ public:
      * @return Perpendicular vector
      */
     constexpr Vec3 cross(const Vec3& other) const noexcept {
-        return Vec3(
-            y * other.z - z * other.y,
-            z * other.x - x * other.z,
-            x * other.y - y * other.x
-        );
+        return Vec3(y * other.z - z * other.y, z * other.x - x * other.z,
+                    x * other.y - y * other.x);
     }
 
     /**
      * @brief Calculate squared length (magnitude squared)
      * @return Length squared
      */
-    constexpr float lengthSquared() const noexcept {
-        return x * x + y * y + z * z;
-    }
+    constexpr float lengthSquared() const noexcept { return x * x + y * y + z * z; }
 
     /**
      * @brief Calculate length (magnitude)
      * @return Length
      */
-    float length() const noexcept {
-        return std::sqrt(lengthSquared());
-    }
+    float length() const noexcept { return std::sqrt(lengthSquared()); }
 
     /**
      * @brief Normalize the vector (return unit vector)
@@ -247,37 +232,27 @@ public:
     /**
      * @brief Zero vector (0, 0, 0)
      */
-    static constexpr Vec3 zero() noexcept {
-        return Vec3(0.0f, 0.0f, 0.0f);
-    }
+    static constexpr Vec3 zero() noexcept { return Vec3(0.0f, 0.0f, 0.0f); }
 
     /**
      * @brief One vector (1, 1, 1)
      */
-    static constexpr Vec3 one() noexcept {
-        return Vec3(1.0f, 1.0f, 1.0f);
-    }
+    static constexpr Vec3 one() noexcept { return Vec3(1.0f, 1.0f, 1.0f); }
 
     /**
      * @brief Unit X vector (1, 0, 0)
      */
-    static constexpr Vec3 unitX() noexcept {
-        return Vec3(1.0f, 0.0f, 0.0f);
-    }
+    static constexpr Vec3 unitX() noexcept { return Vec3(1.0f, 0.0f, 0.0f); }
 
     /**
      * @brief Unit Y vector (0, 1, 0)
      */
-    static constexpr Vec3 unitY() noexcept {
-        return Vec3(0.0f, 1.0f, 0.0f);
-    }
+    static constexpr Vec3 unitY() noexcept { return Vec3(0.0f, 1.0f, 0.0f); }
 
     /**
      * @brief Unit Z vector (0, 0, 1)
      */
-    static constexpr Vec3 unitZ() noexcept {
-        return Vec3(0.0f, 0.0f, 1.0f);
-    }
+    static constexpr Vec3 unitZ() noexcept { return Vec3(0.0f, 0.0f, 1.0f); }
 };
 
 // Free functions for scalar * vector

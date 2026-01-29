@@ -11,6 +11,7 @@ set(AXIOM_MATH_HEADERS
     ${CMAKE_SOURCE_DIR}/include/axiom/math/vec2.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/math/vec3.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/math/vec4.hpp
+    ${CMAKE_SOURCE_DIR}/include/axiom/math/vec_ops.hpp
 )
 
 # Create library target
