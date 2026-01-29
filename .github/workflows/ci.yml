@@ -1,0 +1,274 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.os }} - ${{ matrix.compiler }} - ${{ matrix.build_type }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        compiler: [gcc, clang, msvc]
+        build_type: [Debug, Release]
+        exclude:
+          # MSVC only on Windows
+          - os: ubuntu-latest
+            compiler: msvc
+          - os: macos-latest
+            compiler: msvc
+          # GCC not available on macOS by default
+          - os: macos-latest
+            compiler: gcc
+          # Clang not default on Windows (use MSVC instead)
+          - os: windows-latest
+            compiler: clang
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Set up vcpkg (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
+          ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
+          echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg" >> $GITHUB_ENV
+
+      - name: Set up vcpkg (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
+          ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
+          echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Set up vcpkg (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
+          ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
+          echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg" >> $GITHUB_ENV
+
+      - name: Install dependencies (Linux - GCC)
+        if: matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build g++
+
+      - name: Install dependencies (Linux - Clang)
+        if: matrix.os == 'ubuntu-latest' && matrix.compiler == 'clang'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build clang
+
+      - name: Install dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install ninja
+
+      - name: Install dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install ninja
+
+      - name: Set up compiler (Linux - GCC)
+        if: matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc'
+        run: |
+          echo "CC=gcc" >> $GITHUB_ENV
+          echo "CXX=g++" >> $GITHUB_ENV
+
+      - name: Set up compiler (Linux - Clang)
+        if: matrix.os == 'ubuntu-latest' && matrix.compiler == 'clang'
+        run: |
+          echo "CC=clang" >> $GITHUB_ENV
+          echo "CXX=clang++" >> $GITHUB_ENV
+
+      - name: Set up compiler (macOS - Clang)
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo "CC=clang" >> $GITHUB_ENV
+          echo "CXX=clang++" >> $GITHUB_ENV
+
+      - name: Determine CMake preset
+        id: preset
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            if [[ "${{ matrix.compiler }}" == "gcc" ]]; then
+              PRESET="linux-gcc"
+            else
+              PRESET="linux-clang"
+            fi
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            PRESET="windows-msvc"
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            PRESET="macos-clang"
+          fi
+
+          if [[ "${{ matrix.build_type }}" == "Debug" ]]; then
+            PRESET="${PRESET}"
+          else
+            PRESET="${PRESET}"
+          fi
+
+          echo "preset=${PRESET}" >> $GITHUB_OUTPUT
+
+      - name: Configure CMake
+        run: |
+          cmake --preset ${{ steps.preset.outputs.preset }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+
+      - name: Build
+        run: |
+          cmake --build build/${{ steps.preset.outputs.preset }} --config ${{ matrix.build_type }} --parallel
+
+      - name: Run tests
+        working-directory: build/${{ steps.preset.outputs.preset }}
+        run: |
+          ctest --build-config ${{ matrix.build_type }} --output-on-failure --parallel
+
+  code-coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Set up vcpkg
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
+          ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
+          echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build g++ lcov
+
+      - name: Configure CMake with coverage
+        run: |
+          cmake --preset linux-gcc \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
+            -DCMAKE_C_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
+            -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+
+      - name: Build
+        run: |
+          cmake --build build/linux-gcc --parallel
+
+      - name: Run tests
+        working-directory: build/linux-gcc
+        run: |
+          ctest --output-on-failure || echo "No tests to run yet"
+
+      - name: Generate coverage report
+        continue-on-error: true
+        run: |
+          lcov --directory build/linux-gcc --capture --output-file coverage.info --ignore-errors empty || echo "No coverage data yet (tests not implemented)"
+          if [ -f coverage.info ]; then
+            lcov --remove coverage.info '/usr/*' '*/vcpkg/*' '*/tests/*' '*/benchmarks/*' --output-file coverage.info
+            lcov --list coverage.info
+          fi
+
+      - name: Upload coverage to Codecov
+        if: success() || failure()
+        continue-on-error: true
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.info
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  static-analysis:
+    name: Static Analysis (clang-tidy)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Set up vcpkg
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
+          ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
+          echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build clang clang-tidy
+
+      - name: Configure CMake
+        run: |
+          cmake --preset linux-clang -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Run clang-tidy
+        continue-on-error: true
+        run: |
+          if find src -name "*.cpp" -print -quit | grep -q .; then
+            find src -name "*.cpp" | xargs clang-tidy -p build/linux-clang
+          else
+            echo "No C++ source files found yet - skipping static analysis"
+          fi
+
+  formatting-check:
+    name: Code Formatting Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+
+      - name: Check formatting
+        continue-on-error: true
+        run: |
+          FILES=$(find src include tests benchmarks examples -name "*.cpp" -o -name "*.hpp" -o -name "*.h" 2>/dev/null || true)
+          if [ -n "$FILES" ]; then
+            echo "$FILES" | xargs clang-format --dry-run -Werror || \
+            (echo "Code formatting issues found. Run 'make format' to fix." && exit 1)
+          else
+            echo "No C++ source files found yet - skipping format check"
+          fi

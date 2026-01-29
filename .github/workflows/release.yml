@@ -1,0 +1,245 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v0.1.0)'
+        required: true
+        type: string
+
+env:
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: get_version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: Axiom Physics Engine ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          body: |
+            ## Axiom Physics Engine ${{ steps.get_version.outputs.version }}
+
+            ### Changes
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+
+            ### Installation
+
+            Download the appropriate package for your platform:
+            - `axiom-${{ steps.get_version.outputs.version }}-windows-x64.zip` - Windows (MSVC)
+            - `axiom-${{ steps.get_version.outputs.version }}-linux-x64.tar.gz` - Linux (GCC)
+            - `axiom-${{ steps.get_version.outputs.version }}-macos-arm64.tar.gz` - macOS (Apple Silicon)
+
+            ### Requirements
+            - C++20 compatible compiler
+            - CMake 3.24+
+            - vcpkg (for dependencies)
+            - Vulkan SDK 1.3+ (optional for GPU features)
+
+  build-windows:
+    name: Build Windows
+    needs: create-release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Set up vcpkg
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
+          ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
+          echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Install Ninja
+        run: choco install ninja
+
+      - name: Configure CMake
+        run: |
+          cmake --preset windows-msvc -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build build/windows-msvc --config Release --parallel
+
+      - name: Run tests
+        working-directory: build/windows-msvc
+        run: |
+          ctest --build-config Release --output-on-failure
+
+      - name: Install
+        run: |
+          cmake --install build/windows-msvc --prefix install/windows --config Release
+
+      - name: Package
+        run: |
+          cd install/windows
+          7z a ../../axiom-${{ needs.create-release.outputs.version }}-windows-x64.zip *
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./axiom-${{ needs.create-release.outputs.version }}-windows-x64.zip
+          asset_name: axiom-${{ needs.create-release.outputs.version }}-windows-x64.zip
+          asset_content_type: application/zip
+
+  build-linux:
+    name: Build Linux
+    needs: create-release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Set up vcpkg
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
+          ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
+          echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build g++
+
+      - name: Configure CMake
+        run: |
+          cmake --preset linux-gcc -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build build/linux-gcc --parallel
+
+      - name: Run tests
+        working-directory: build/linux-gcc
+        run: |
+          ctest --output-on-failure
+
+      - name: Install
+        run: |
+          cmake --install build/linux-gcc --prefix install/linux
+
+      - name: Package
+        run: |
+          cd install/linux
+          tar -czf ../../axiom-${{ needs.create-release.outputs.version }}-linux-x64.tar.gz *
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./axiom-${{ needs.create-release.outputs.version }}-linux-x64.tar.gz
+          asset_name: axiom-${{ needs.create-release.outputs.version }}-linux-x64.tar.gz
+          asset_content_type: application/gzip
+
+  build-macos:
+    name: Build macOS
+    needs: create-release
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Set up vcpkg
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
+          ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
+          echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          brew install ninja
+
+      - name: Configure CMake
+        run: |
+          cmake --preset macos-clang -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build build/macos-clang --parallel
+
+      - name: Run tests
+        working-directory: build/macos-clang
+        run: |
+          ctest --output-on-failure
+
+      - name: Install
+        run: |
+          cmake --install build/macos-clang --prefix install/macos
+
+      - name: Package
+        run: |
+          cd install/macos
+          tar -czf ../../axiom-${{ needs.create-release.outputs.version }}-macos-arm64.tar.gz *
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./axiom-${{ needs.create-release.outputs.version }}-macos-arm64.tar.gz
+          asset_name: axiom-${{ needs.create-release.outputs.version }}-macos-arm64.tar.gz
+          asset_content_type: application/gzip
