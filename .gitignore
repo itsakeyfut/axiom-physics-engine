@@ -1,1 +1,6 @@
 docs/
+
+.claude/settings.local.json
+.claude/commands/
+.claude/hooks/
+.claude/skills/
