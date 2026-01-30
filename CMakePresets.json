@@ -73,6 +73,18 @@
       }
     },
     {
+      "name": "windows-debug-ninja",
+      "displayName": "Windows Debug (Ninja + MSVC)",
+      "description": "Debug build with Ninja generator for clang-tidy support",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "AXIOM_BUILD_TESTS": "ON",
+        "AXIOM_BUILD_BENCHMARKS": "OFF",
+        "AXIOM_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
       "name": "windows-release",
       "displayName": "Windows Release (MSVC)",
       "inherits": "windows-msvc",

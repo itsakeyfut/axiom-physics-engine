@@ -40,7 +40,6 @@ Checks: >
 # Warning options
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*axiom.*'
-AnalyzeTemporaryDtors: false
 FormatStyle: file
 
 # Check-specific options
