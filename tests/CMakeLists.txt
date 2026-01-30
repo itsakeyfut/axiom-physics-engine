@@ -16,6 +16,7 @@ add_executable(axiom_tests
     memory/linear_allocator_test.cpp
     memory/stack_allocator_test.cpp
     memory/stl_adapter_test.cpp
+    memory/memory_tracker_test.cpp
 )
 
 # Link libraries

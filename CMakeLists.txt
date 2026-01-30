@@ -76,6 +76,7 @@ endif()
 # Configuration-specific settings
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(AXIOM_DEBUG=1)
+    add_compile_definitions(AXIOM_ENABLE_MEMORY_TRACKING=1)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_definitions(AXIOM_RELEASE=1 NDEBUG)
 elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
