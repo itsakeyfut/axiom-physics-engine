@@ -2,7 +2,7 @@
 
 # Source files
 set(AXIOM_MEMORY_SOURCES
-    default_allocator.cpp
+    heap_allocator.cpp
 )
 
 # Create memory library
