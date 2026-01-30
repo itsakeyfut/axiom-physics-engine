@@ -1,5 +1,5 @@
-#include "axiom/memory/linear_allocator.hpp"
 #include "axiom/memory/heap_allocator.hpp"
+#include "axiom/memory/linear_allocator.hpp"
 
 #include <benchmark/benchmark.h>
 
@@ -199,15 +199,15 @@ BENCHMARK(BM_LinearAllocator_ScopeGuard)->Range(10, 1000);
 
 // Large allocations
 BENCHMARK(BM_LinearAllocator_LargeAllocation)
-    ->Arg(1024 * 1024)      // 1MB
-    ->Arg(4 * 1024 * 1024)  // 4MB
-    ->Arg(16 * 1024 * 1024) // 16MB
-    ->Arg(64 * 1024 * 1024);// 64MB
+    ->Arg(1024 * 1024)        // 1MB
+    ->Arg(4 * 1024 * 1024)    // 4MB
+    ->Arg(16 * 1024 * 1024)   // 16MB
+    ->Arg(64 * 1024 * 1024);  // 64MB
 
 BENCHMARK(BM_HeapAllocator_LargeAllocation)
-    ->Arg(1024 * 1024)      // 1MB
-    ->Arg(4 * 1024 * 1024)  // 4MB
-    ->Arg(16 * 1024 * 1024) // 16MB
-    ->Arg(64 * 1024 * 1024);// 64MB
+    ->Arg(1024 * 1024)        // 1MB
+    ->Arg(4 * 1024 * 1024)    // 4MB
+    ->Arg(16 * 1024 * 1024)   // 16MB
+    ->Arg(64 * 1024 * 1024);  // 64MB
 
 BENCHMARK_MAIN();

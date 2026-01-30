@@ -117,8 +117,7 @@ void HeapAllocator::updatePeak() {
     size_t peak = peakAllocatedSize_.load(std::memory_order_relaxed);
 
     while (current > peak) {
-        if (peakAllocatedSize_.compare_exchange_weak(peak, current,
-                                                     std::memory_order_relaxed)) {
+        if (peakAllocatedSize_.compare_exchange_weak(peak, current, std::memory_order_relaxed)) {
             break;
         }
     }
