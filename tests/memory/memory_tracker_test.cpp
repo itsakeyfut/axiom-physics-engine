@@ -408,7 +408,7 @@ TEST_F(MemoryTrackerTest, ConcurrentAllocations) {
 
     // Launch threads
     for (size_t t = 0; t < threadCount; ++t) {
-        threads.emplace_back([&tracker, &threadPtrs, t, allocationsPerThread]() {
+        threads.emplace_back([&tracker, &threadPtrs, t]() {
             for (size_t i = 0; i < allocationsPerThread; ++i) {
                 void* ptr = malloc(64);
                 if (ptr) {
