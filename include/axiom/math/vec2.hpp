@@ -27,10 +27,10 @@ public:
 
     /**
      * @brief Construct from x and y components
-     * @param x X component
-     * @param y Y component
+     * @param inX X component
+     * @param inY Y component
      */
-    constexpr Vec2(float x, float y) noexcept : x(x), y(y) {}
+    constexpr Vec2(float inX, float inY) noexcept : x(inX), y(inY) {}
 
     /**
      * @brief Construct with same value for all components
@@ -52,18 +52,14 @@ public:
      * @param index 0 for x, 1 for y
      * @return Reference to component
      */
-    float& operator[](size_t index) noexcept {
-        return (&x)[index];
-    }
+    float& operator[](size_t index) noexcept { return (&x)[index]; }
 
     /**
      * @brief Const array-style access to components
      * @param index 0 for x, 1 for y
      * @return Const reference to component
      */
-    const float& operator[](size_t index) const noexcept {
-        return (&x)[index];
-    }
+    const float& operator[](size_t index) const noexcept { return (&x)[index]; }
 
     // Arithmetic operators
 
@@ -98,23 +94,17 @@ public:
     /**
      * @brief Scalar multiplication
      */
-    constexpr Vec2 operator*(float scalar) const noexcept {
-        return Vec2(x * scalar, y * scalar);
-    }
+    constexpr Vec2 operator*(float scalar) const noexcept { return Vec2(x * scalar, y * scalar); }
 
     /**
      * @brief Scalar division
      */
-    constexpr Vec2 operator/(float scalar) const noexcept {
-        return Vec2(x / scalar, y / scalar);
-    }
+    constexpr Vec2 operator/(float scalar) const noexcept { return Vec2(x / scalar, y / scalar); }
 
     /**
      * @brief Unary negation
      */
-    constexpr Vec2 operator-() const noexcept {
-        return Vec2(-x, -y);
-    }
+    constexpr Vec2 operator-() const noexcept { return Vec2(-x, -y); }
 
     // Compound assignment operators
 
@@ -166,39 +156,29 @@ public:
     /**
      * @brief Inequality comparison
      */
-    constexpr bool operator!=(const Vec2& other) const noexcept {
-        return !(*this == other);
-    }
+    constexpr bool operator!=(const Vec2& other) const noexcept { return !(*this == other); }
 
     // Static utility functions
 
     /**
      * @brief Zero vector (0, 0)
      */
-    static constexpr Vec2 zero() noexcept {
-        return Vec2(0.0f, 0.0f);
-    }
+    static constexpr Vec2 zero() noexcept { return Vec2(0.0f, 0.0f); }
 
     /**
      * @brief One vector (1, 1)
      */
-    static constexpr Vec2 one() noexcept {
-        return Vec2(1.0f, 1.0f);
-    }
+    static constexpr Vec2 one() noexcept { return Vec2(1.0f, 1.0f); }
 
     /**
      * @brief Unit X vector (1, 0)
      */
-    static constexpr Vec2 unitX() noexcept {
-        return Vec2(1.0f, 0.0f);
-    }
+    static constexpr Vec2 unitX() noexcept { return Vec2(1.0f, 0.0f); }
 
     /**
      * @brief Unit Y vector (0, 1)
      */
-    static constexpr Vec2 unitY() noexcept {
-        return Vec2(0.0f, 1.0f);
-    }
+    static constexpr Vec2 unitY() noexcept { return Vec2(0.0f, 1.0f); }
 };
 
 // Free functions for scalar * vector

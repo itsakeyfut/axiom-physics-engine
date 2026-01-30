@@ -3,6 +3,7 @@
 # Test executable
 add_executable(axiom_tests
     math/test_vec.cpp
+    math/test_vec_ops.cpp
 )
 
 # Link libraries

@@ -30,12 +30,13 @@ public:
 
     /**
      * @brief Construct from x, y, z, and w components
-     * @param x X component
-     * @param y Y component
-     * @param z Z component
-     * @param w W component
+     * @param inX X component
+     * @param inY Y component
+     * @param inZ Z component
+     * @param inW W component
      */
-    constexpr Vec4(float x, float y, float z, float w) noexcept : x(x), y(y), z(z), w(w) {}
+    constexpr Vec4(float inX, float inY, float inZ, float inW) noexcept
+        : x(inX), y(inY), z(inZ), w(inW) {}
 
     /**
      * @brief Construct with same value for all components
@@ -57,18 +58,14 @@ public:
      * @param index 0 for x, 1 for y, 2 for z, 3 for w
      * @return Reference to component
      */
-    float& operator[](size_t index) noexcept {
-        return (&x)[index];
-    }
+    float& operator[](size_t index) noexcept { return (&x)[index]; }
 
     /**
      * @brief Const array-style access to components
      * @param index 0 for x, 1 for y, 2 for z, 3 for w
      * @return Const reference to component
      */
-    const float& operator[](size_t index) const noexcept {
-        return (&x)[index];
-    }
+    const float& operator[](size_t index) const noexcept { return (&x)[index]; }
 
     // Arithmetic operators
 
@@ -117,9 +114,7 @@ public:
     /**
      * @brief Unary negation
      */
-    constexpr Vec4 operator-() const noexcept {
-        return Vec4(-x, -y, -z, -w);
-    }
+    constexpr Vec4 operator-() const noexcept { return Vec4(-x, -y, -z, -w); }
 
     // Compound assignment operators
 
@@ -183,9 +178,7 @@ public:
     /**
      * @brief Inequality comparison
      */
-    constexpr bool operator!=(const Vec4& other) const noexcept {
-        return !(*this == other);
-    }
+    constexpr bool operator!=(const Vec4& other) const noexcept { return !(*this == other); }
 
     // Vector operations
 
@@ -202,17 +195,13 @@ public:
      * @brief Calculate squared length (magnitude squared)
      * @return Length squared
      */
-    constexpr float lengthSquared() const noexcept {
-        return x * x + y * y + z * z + w * w;
-    }
+    constexpr float lengthSquared() const noexcept { return x * x + y * y + z * z + w * w; }
 
     /**
      * @brief Calculate length (magnitude)
      * @return Length
      */
-    float length() const noexcept {
-        return std::sqrt(lengthSquared());
-    }
+    float length() const noexcept { return std::sqrt(lengthSquared()); }
 
     /**
      * @brief Normalize the vector (return unit vector)
@@ -243,44 +232,32 @@ public:
     /**
      * @brief Zero vector (0, 0, 0, 0)
      */
-    static constexpr Vec4 zero() noexcept {
-        return Vec4(0.0f, 0.0f, 0.0f, 0.0f);
-    }
+    static constexpr Vec4 zero() noexcept { return Vec4(0.0f, 0.0f, 0.0f, 0.0f); }
 
     /**
      * @brief One vector (1, 1, 1, 1)
      */
-    static constexpr Vec4 one() noexcept {
-        return Vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    }
+    static constexpr Vec4 one() noexcept { return Vec4(1.0f, 1.0f, 1.0f, 1.0f); }
 
     /**
      * @brief Unit X vector (1, 0, 0, 0)
      */
-    static constexpr Vec4 unitX() noexcept {
-        return Vec4(1.0f, 0.0f, 0.0f, 0.0f);
-    }
+    static constexpr Vec4 unitX() noexcept { return Vec4(1.0f, 0.0f, 0.0f, 0.0f); }
 
     /**
      * @brief Unit Y vector (0, 1, 0, 0)
      */
-    static constexpr Vec4 unitY() noexcept {
-        return Vec4(0.0f, 1.0f, 0.0f, 0.0f);
-    }
+    static constexpr Vec4 unitY() noexcept { return Vec4(0.0f, 1.0f, 0.0f, 0.0f); }
 
     /**
      * @brief Unit Z vector (0, 0, 1, 0)
      */
-    static constexpr Vec4 unitZ() noexcept {
-        return Vec4(0.0f, 0.0f, 1.0f, 0.0f);
-    }
+    static constexpr Vec4 unitZ() noexcept { return Vec4(0.0f, 0.0f, 1.0f, 0.0f); }
 
     /**
      * @brief Unit W vector (0, 0, 0, 1)
      */
-    static constexpr Vec4 unitW() noexcept {
-        return Vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    }
+    static constexpr Vec4 unitW() noexcept { return Vec4(0.0f, 0.0f, 0.0f, 1.0f); }
 };
 
 // Free functions for scalar * vector
