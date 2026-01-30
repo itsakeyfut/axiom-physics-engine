@@ -1,11 +1,10 @@
-#include "axiom/memory/stl_adapter.hpp"
-
-#include <gtest/gtest.h>
-
 #include "axiom/memory/heap_allocator.hpp"
 #include "axiom/memory/linear_allocator.hpp"
 #include "axiom/memory/pool_allocator.hpp"
 #include "axiom/memory/stack_allocator.hpp"
+#include "axiom/memory/stl_adapter.hpp"
+
+#include <gtest/gtest.h>
 
 #include <algorithm>
 #include <map>
@@ -136,9 +135,8 @@ TEST(StlAllocatorAdapterTest, AllocateOverflow) {
     // Try to allocate an amount that would overflow size_t
     const size_t hugeSize = std::numeric_limits<size_t>::max() / sizeof(int) + 1;
 
-    EXPECT_THROW({
-        [[maybe_unused]] int* ptr = adapter.allocate(hugeSize);
-    }, std::bad_array_new_length);
+    EXPECT_THROW(
+        { [[maybe_unused]] int* ptr = adapter.allocate(hugeSize); }, std::bad_array_new_length);
 }
 
 TEST(StlAllocatorAdapterTest, DeallocateNullptr) {
@@ -203,8 +201,7 @@ TEST(StlAllocatorAdapterTest, VectorResize) {
 
 TEST(StlAllocatorAdapterTest, VectorWithLinearAllocator) {
     LinearAllocator linearAlloc(1024 * 1024);  // 1MB
-    std::vector<float, StlAllocatorAdapter<float>> vec{
-        StlAllocatorAdapter<float>(&linearAlloc)};
+    std::vector<float, StlAllocatorAdapter<float>> vec{StlAllocatorAdapter<float>(&linearAlloc)};
 
     const size_t initialUsage = linearAlloc.getAllocatedSize();
 
@@ -237,7 +234,8 @@ TEST(StlAllocatorAdapterTest, VectorWithLinearAllocator) {
 
 TEST(StlAllocatorAdapterTest, MapBasicOperations) {
     HeapAllocator heapAlloc;
-    std::map<int, std::string, std::less<int>, StlAllocatorAdapter<std::pair<const int, std::string>>>
+    std::map<int, std::string, std::less<int>,
+             StlAllocatorAdapter<std::pair<const int, std::string>>>
         intStrMap{StlAllocatorAdapter<std::pair<const int, std::string>>(&heapAlloc)};
 
     bool isEmpty = intStrMap.empty();
@@ -613,7 +611,8 @@ TEST(StlAllocatorAdapterTest, VectorOfComplexTypes) {
 
 TEST(StlAllocatorAdapterTest, SetOfComplexTypes) {
     HeapAllocator heapAlloc;
-    using ComplexSet = std::set<ComplexType, std::less<ComplexType>, StlAllocatorAdapter<ComplexType>>;
+    using ComplexSet =
+        std::set<ComplexType, std::less<ComplexType>, StlAllocatorAdapter<ComplexType>>;
     ComplexSet mySet{StlAllocatorAdapter<ComplexType>(&heapAlloc)};
 
     mySet.emplace(3, "third");
