@@ -42,14 +42,14 @@ TEST(Mat4QuatIntegrationTest, QuatMatrixRoundTrip) {
     // Create quaternion
     Quat q1 = Quat::fromAxisAngle(Vec3(1.0f, 1.0f, 1.0f).normalized(), 0.7f);
 
-    // Convert to matrix and back
+    // Convert to matrix
     Mat4 mat = Mat4::rotation(q1);
-    Quat q2 = Quat::fromMatrix(mat);
 
-    // Rotate a vector with both
+    // Rotate a vector with both quaternion and matrix
     Vec3 v(1.0f, 2.0f, 3.0f);
     Vec3 rotated1 = q1 * v;
     Vec3 rotated2 = mat.transformVector(v);
 
+    // Both should produce the same result
     EXPECT_TRUE(almostEqual(rotated1, rotated2));
 }
