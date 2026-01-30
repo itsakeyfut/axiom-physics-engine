@@ -102,9 +102,12 @@ TEST(RandomTest, DeterministicRNGNextFloatDistribution) {
     }
 
     // Should be roughly 50/50 split (allow 10% tolerance)
-    float ratio = static_cast<float>(countLow) / static_cast<float>(samples);
-    EXPECT_GT(ratio, 0.45f);
-    EXPECT_LT(ratio, 0.55f);
+    float ratioLow = static_cast<float>(countLow) / static_cast<float>(samples);
+    float ratioHigh = static_cast<float>(countHigh) / static_cast<float>(samples);
+    EXPECT_GT(ratioLow, 0.45f);
+    EXPECT_LT(ratioLow, 0.55f);
+    EXPECT_GT(ratioHigh, 0.45f);
+    EXPECT_LT(ratioHigh, 0.55f);
 }
 
 // ============================================================================
