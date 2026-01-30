@@ -6,6 +6,7 @@ set(AXIOM_MATH_SOURCES
     mat4.cpp
     quat.cpp
     transform.cpp
+    aabb.cpp
 )
 
 # Header files (for IDE organization)
@@ -17,6 +18,7 @@ set(AXIOM_MATH_HEADERS
     ${CMAKE_SOURCE_DIR}/include/axiom/math/mat4.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/math/quat.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/math/transform.hpp
+    ${CMAKE_SOURCE_DIR}/include/axiom/math/aabb.hpp
 )
 
 # Create library target
