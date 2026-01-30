@@ -10,11 +10,7 @@ namespace axiom::memory {
 // ============================================================================
 
 LinearAllocator::LinearAllocator(size_t capacity)
-    : buffer_(nullptr),
-      capacity_(capacity),
-      offset_(0),
-      peakUsage_(0),
-      allocationCount_(0) {
+    : buffer_(nullptr), capacity_(capacity), offset_(0), peakUsage_(0), allocationCount_(0) {
     if (capacity > 0) {
         // Allocate buffer with 64-byte alignment for SIMD
         buffer_ = static_cast<uint8_t*>(alignedAlloc(capacity, 64));

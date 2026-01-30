@@ -265,11 +265,11 @@ private:
      */
     void updatePeak();
 
-    uint8_t* buffer_;           ///< Pre-allocated memory buffer
-    size_t capacity_;           ///< Total buffer size in bytes
-    size_t offset_;             ///< Current allocation offset
-    size_t peakUsage_;          ///< Maximum offset reached
-    size_t allocationCount_;    ///< Total number of allocations
+    uint8_t* buffer_;         ///< Pre-allocated memory buffer
+    size_t capacity_;         ///< Total buffer size in bytes
+    size_t offset_;           ///< Current allocation offset
+    size_t peakUsage_;        ///< Maximum offset reached
+    size_t allocationCount_;  ///< Total number of allocations
 };
 
 /**
@@ -451,9 +451,9 @@ public:
     size_t getPeakUsage() const;
 
 private:
-    LinearAllocator* buffers_[2];   ///< Two alternating buffers
-    size_t currentBuffer_;          ///< Index of current buffer (0 or 1)
-    size_t frameNumber_;            ///< Number of flips (frame counter)
+    LinearAllocator* buffers_[2];  ///< Two alternating buffers
+    size_t currentBuffer_;         ///< Index of current buffer (0 or 1)
+    size_t frameNumber_;           ///< Number of flips (frame counter)
 };
 
 }  // namespace axiom::memory

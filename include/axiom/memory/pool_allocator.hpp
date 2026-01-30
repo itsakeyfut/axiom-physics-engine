@@ -207,8 +207,8 @@ private:
      * free-list is empty.
      */
     struct Chunk {
-        void* memory;        ///< Pointer to chunk memory (aligned)
-        size_t blockCount;   ///< Number of blocks in this chunk
+        void* memory;       ///< Pointer to chunk memory (aligned)
+        size_t blockCount;  ///< Number of blocks in this chunk
 
         Chunk(size_t numBlocks, size_t blockSize, size_t alignment);
         ~Chunk();
@@ -240,10 +240,10 @@ private:
      */
     bool allocateNewChunk();
 
-    size_t blocksPerChunk_;                  ///< Blocks per chunk
+    size_t blocksPerChunk_;                       ///< Blocks per chunk
     std::vector<std::unique_ptr<Chunk>> chunks_;  ///< All allocated chunks
-    FreeNode* freeListHead_;                 ///< Head of free-list (nullptr if empty)
-    size_t freeListSize_;                    ///< Number of blocks in free-list
+    FreeNode* freeListHead_;                      ///< Head of free-list (nullptr if empty)
+    size_t freeListSize_;                         ///< Number of blocks in free-list
 };
 
 // ============================================================================
@@ -390,7 +390,7 @@ bool PoolAllocator<BlockSize, Alignment>::allocateNewChunk() {
 
 template <size_t BlockSize, size_t Alignment>
 PoolAllocator<BlockSize, Alignment>::Chunk::Chunk(size_t numBlocks, size_t blockSize,
-                                                    size_t alignment)
+                                                  size_t alignment)
     : memory(nullptr), blockCount(numBlocks) {
     const size_t totalSize = numBlocks * blockSize;
     memory = alignedAlloc(totalSize, alignment);
@@ -418,8 +418,7 @@ bool PoolAllocator<BlockSize, Alignment>::Chunk::contains(void* ptr, size_t bloc
 }
 
 template <size_t BlockSize, size_t Alignment>
-void* PoolAllocator<BlockSize, Alignment>::Chunk::getBlock(size_t index,
-                                                             size_t blockSize) const {
+void* PoolAllocator<BlockSize, Alignment>::Chunk::getBlock(size_t index, size_t blockSize) const {
     if (!memory || index >= blockCount) {
         return nullptr;
     }

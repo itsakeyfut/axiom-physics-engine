@@ -165,10 +165,10 @@ private:
      */
     void updatePeak();
 
-    std::atomic<size_t> allocatedSize_{0};       ///< Current allocated size
-    std::atomic<size_t> allocationCount_{0};     ///< Total allocations
-    std::atomic<size_t> deallocationCount_{0};   ///< Total deallocations
-    std::atomic<size_t> peakAllocatedSize_{0};   ///< Peak memory usage
+    std::atomic<size_t> allocatedSize_{0};      ///< Current allocated size
+    std::atomic<size_t> allocationCount_{0};    ///< Total allocations
+    std::atomic<size_t> deallocationCount_{0};  ///< Total deallocations
+    std::atomic<size_t> peakAllocatedSize_{0};  ///< Peak memory usage
 };
 
 }  // namespace axiom::memory
