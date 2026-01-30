@@ -50,16 +50,16 @@ Thank you for your interest in contributing to Axiom! This document provides gui
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| **Files** | snake_case | `rigid_body.hpp`, `vec3.cpp` |
-| **Classes/Structs** | PascalCase | `RigidBody`, `PhysicsWorld` |
-| **Functions/Methods** | camelCase | `getPosition()`, `setVelocity()` |
-| **Member Variables** | camelCase + trailing `_` | `position_`, `velocity_` |
-| **Local Variables** | camelCase | `deltaTime`, `contactPoint` |
-| **Constants** | UPPER_SNAKE_CASE | `MAX_CONTACTS`, `DEFAULT_GRAVITY` |
-| **Namespaces** | lowercase | `axiom::core`, `axiom::collision` |
-| **Template Parameters** | PascalCase | `template<typename T>` |
+| Type                    | Convention               | Example                           |
+| ----------------------- | ------------------------ | --------------------------------- |
+| **Files**               | snake_case               | `rigid_body.hpp`, `vec3.cpp`      |
+| **Classes/Structs**     | PascalCase               | `RigidBody`, `PhysicsWorld`       |
+| **Functions/Methods**   | camelCase                | `getPosition()`, `setVelocity()`  |
+| **Member Variables**    | camelCase + trailing `_` | `position_`, `velocity_`          |
+| **Local Variables**     | camelCase                | `deltaTime`, `contactPoint`       |
+| **Constants**           | UPPER_SNAKE_CASE         | `MAX_CONTACTS`, `DEFAULT_GRAVITY` |
+| **Namespaces**          | lowercase                | `axiom::core`, `axiom::collision` |
+| **Template Parameters** | PascalCase               | `template<typename T>`            |
 
 ### Formatting
 
@@ -86,6 +86,7 @@ Include files in the following order, with a blank line between groups:
 4. Standard library headers (`<vector>`, `<memory>`)
 
 Example:
+
 ```cpp
 #include "axiom/core/rigid_body.hpp"  // Corresponding header
 
@@ -101,6 +102,7 @@ Example:
 ### Code Style
 
 **Classes:**
+
 ```cpp
 class RigidBody {
 public:
@@ -118,19 +120,19 @@ private:
 ```
 
 **Namespaces:**
+
 ```cpp
-namespace axiom {
-namespace collision {
+namespace axiom::collision {
 
 class Shape {
     // ...
 };
 
-}  // namespace collision
-}  // namespace axiom
+}  // namespace axiom::collision
 ```
 
 **Constants:**
+
 ```cpp
 namespace axiom::physics {
     constexpr float DEFAULT_GRAVITY = -9.81f;
@@ -139,13 +141,15 @@ namespace axiom::physics {
 ```
 
 **Auto Usage:**
+
 - Use `auto` when the type is obvious or verbose
 - Prefer explicit types for clarity when type isn't obvious
 
 **Comments:**
+
 - Use `//` for single-line comments
 - Use `/** ... */` for documentation comments
-- Write self-documenting code; comment *why*, not *what*
+- Write self-documenting code; comment _why_, not _what_
 
 ### Modern C++ Best Practices
 
@@ -172,6 +176,7 @@ namespace axiom::physics {
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `refactor`: Code refactoring
@@ -184,6 +189,7 @@ namespace axiom::physics {
 **Scope** (optional): The module affected (core, math, collision, dynamics, etc.)
 
 **Examples:**
+
 ```
 feat(math): add quaternion slerp implementation
 
@@ -208,23 +214,26 @@ Update the epsilon comparison to use relative tolerance.
 - No period at the end of subject line
 - Separate subject from body with a blank line
 - Wrap body at 72 characters
-- Use body to explain *what* and *why*, not *how*
+- Use body to explain _what_ and _why_, not _how_
 - Reference issues and PRs in footer
 
 ## Pull Request Process
 
 1. **Update your branch** with latest `main`:
+
    ```bash
    git fetch origin
    git rebase origin/main
    ```
 
 2. **Ensure all tests pass**:
+
    ```bash
    ctest --preset windows-debug
    ```
 
 3. **Run code formatter**:
+
    ```bash
    clang-format -i <changed_files>
    ```
@@ -264,6 +273,7 @@ Update the epsilon comparison to use relative tolerance.
 - Place tests in `tests/` directory mirroring source structure
 
 Example:
+
 ```cpp
 #include <gtest/gtest.h>
 #include "axiom/math/vec3.hpp"
@@ -316,6 +326,7 @@ ctest --preset windows-debug --verbose
 - Keep CLAUDE.md updated with architectural decisions
 
 Example:
+
 ```cpp
 /**
  * @brief Applies a force to the rigid body.

@@ -3,8 +3,7 @@
 #include <cmath>
 #include <cstddef>
 
-namespace axiom {
-namespace math {
+namespace axiom::math {
 
 /**
  * @brief 4D vector class with x, y, z, and w components
@@ -276,5 +275,4 @@ constexpr float dot(const Vec4& a, const Vec4& b) noexcept {
     return a.dot(b);
 }
 
-}  // namespace math
-}  // namespace axiom
+}  // namespace axiom::math
