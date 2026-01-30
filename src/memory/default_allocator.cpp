@@ -7,7 +7,7 @@
 #ifdef _WIN32
 #include <malloc.h>  // _aligned_malloc, _aligned_free
 #else
-#include <cstdlib>  // aligned_alloc, free (C11)
+#include <cstdlib>  // posix_memalign, free
 #endif
 
 namespace axiom::memory {
@@ -30,10 +30,18 @@ void* alignedAlloc(size_t size, size_t alignment) {
     // Windows: use _aligned_malloc
     return _aligned_malloc(size, alignment);
 #else
-    // POSIX: use aligned_alloc (C11)
-    // Note: aligned_alloc requires size to be a multiple of alignment
-    size_t adjustedSize = ((size + alignment - 1) / alignment) * alignment;
-    return aligned_alloc(alignment, adjustedSize);
+    // POSIX: use posix_memalign (more portable than aligned_alloc)
+    // posix_memalign requires alignment to be a multiple of sizeof(void*)
+    size_t actualAlignment = alignment;
+    if (actualAlignment < sizeof(void*)) {
+        actualAlignment = sizeof(void*);
+    }
+
+    void* ptr = nullptr;
+    if (posix_memalign(&ptr, actualAlignment, size) != 0) {
+        return nullptr;
+    }
+    return ptr;
 #endif
 }
 
