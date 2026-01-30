@@ -7,6 +7,7 @@ add_executable(axiom_tests
     math/mat4_test.cpp
     math/quat_test.cpp
     math/mat4_quat_integration_test.cpp
+    math/transform_test.cpp
 )
 
 # Link libraries
