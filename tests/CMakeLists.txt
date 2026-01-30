@@ -13,6 +13,7 @@ add_executable(axiom_tests
     math/random_test.cpp
     memory/allocator_test.cpp
     memory/pool_allocator_test.cpp
+    memory/linear_allocator_test.cpp
 )
 
 # Link libraries
