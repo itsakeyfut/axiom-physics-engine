@@ -15,14 +15,14 @@ static void BM_LinearAllocator_SmallAllocations(benchmark::State& state) {
 
     for (auto _ : state) {
         allocator.reset();
-        for (int i = 0; i < state.range(0); ++i) {
+        for (int64_t i = 0; i < state.range(0); ++i) {
             void* ptr = allocator.allocate(allocSize, 8);
             benchmark::DoNotOptimize(ptr);
         }
     }
 
     state.SetItemsProcessed(state.iterations() * state.range(0));
-    state.SetBytesProcessed(state.iterations() * state.range(0) * allocSize);
+    state.SetBytesProcessed(state.iterations() * state.range(0) * static_cast<int64_t>(allocSize));
 }
 
 static void BM_HeapAllocator_SmallAllocations(benchmark::State& state) {
@@ -31,9 +31,9 @@ static void BM_HeapAllocator_SmallAllocations(benchmark::State& state) {
 
     for (auto _ : state) {
         std::vector<void*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
-        for (int i = 0; i < state.range(0); ++i) {
+        for (int64_t i = 0; i < state.range(0); ++i) {
             void* ptr = allocator.allocate(allocSize, 8);
             benchmark::DoNotOptimize(ptr);
             ptrs.push_back(ptr);
@@ -46,7 +46,7 @@ static void BM_HeapAllocator_SmallAllocations(benchmark::State& state) {
     }
 
     state.SetItemsProcessed(state.iterations() * state.range(0));
-    state.SetBytesProcessed(state.iterations() * state.range(0) * allocSize);
+    state.SetBytesProcessed(state.iterations() * state.range(0) * static_cast<int64_t>(allocSize));
 }
 
 // ============================================================================
@@ -58,7 +58,7 @@ static void BM_LinearAllocator_Alignment8(benchmark::State& state) {
 
     for (auto _ : state) {
         allocator.reset();
-        for (int i = 0; i < state.range(0); ++i) {
+        for (int64_t i = 0; i < state.range(0); ++i) {
             void* ptr = allocator.allocate(1, 8);
             benchmark::DoNotOptimize(ptr);
         }
@@ -72,7 +72,7 @@ static void BM_LinearAllocator_Alignment64(benchmark::State& state) {
 
     for (auto _ : state) {
         allocator.reset();
-        for (int i = 0; i < state.range(0); ++i) {
+        for (int64_t i = 0; i < state.range(0); ++i) {
             void* ptr = allocator.allocate(1, 64);
             benchmark::DoNotOptimize(ptr);
         }
@@ -90,7 +90,7 @@ static void BM_FrameAllocator_SimulateFrames(benchmark::State& state) {
 
     for (auto _ : state) {
         // Simulate frame allocations
-        for (int i = 0; i < state.range(0); ++i) {
+        for (int64_t i = 0; i < state.range(0); ++i) {
             void* ptr = allocator.allocate(128, 16);
             benchmark::DoNotOptimize(ptr);
         }
@@ -113,7 +113,7 @@ static void BM_LinearAllocator_MarkerReset(benchmark::State& state) {
         auto marker = allocator.getMarker();
 
         // Allocate temporary data
-        for (int i = 0; i < state.range(0); ++i) {
+        for (int64_t i = 0; i < state.range(0); ++i) {
             void* ptr = allocator.allocate(64, 8);
             benchmark::DoNotOptimize(ptr);
         }
@@ -136,7 +136,7 @@ static void BM_LinearAllocator_ScopeGuard(benchmark::State& state) {
         {
             LinearAllocatorScope scope(allocator);
 
-            for (int i = 0; i < state.range(0); ++i) {
+            for (int64_t i = 0; i < state.range(0); ++i) {
                 void* ptr = allocator.allocate(64, 8);
                 benchmark::DoNotOptimize(ptr);
             }
@@ -151,7 +151,7 @@ static void BM_LinearAllocator_ScopeGuard(benchmark::State& state) {
 // ============================================================================
 
 static void BM_LinearAllocator_LargeAllocation(benchmark::State& state) {
-    const size_t allocSize = state.range(0);
+    const size_t allocSize = static_cast<size_t>(state.range(0));
     LinearAllocator allocator(100 * 1024 * 1024);  // 100MB
 
     for (auto _ : state) {
@@ -160,11 +160,11 @@ static void BM_LinearAllocator_LargeAllocation(benchmark::State& state) {
         benchmark::DoNotOptimize(ptr);
     }
 
-    state.SetBytesProcessed(state.iterations() * allocSize);
+    state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(allocSize));
 }
 
 static void BM_HeapAllocator_LargeAllocation(benchmark::State& state) {
-    const size_t allocSize = state.range(0);
+    const size_t allocSize = static_cast<size_t>(state.range(0));
     HeapAllocator allocator;
 
     for (auto _ : state) {
@@ -173,7 +173,7 @@ static void BM_HeapAllocator_LargeAllocation(benchmark::State& state) {
         allocator.deallocate(ptr, allocSize);
     }
 
-    state.SetBytesProcessed(state.iterations() * allocSize);
+    state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(allocSize));
 }
 
 // ============================================================================
