@@ -3,7 +3,7 @@
 
 # Source files
 set(AXIOM_MATH_SOURCES
-    math_placeholder.cpp
+    mat4.cpp
 )
 
 # Header files (for IDE organization)
@@ -12,6 +12,7 @@ set(AXIOM_MATH_HEADERS
     ${CMAKE_SOURCE_DIR}/include/axiom/math/vec3.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/math/vec4.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/math/vec_ops.hpp
+    ${CMAKE_SOURCE_DIR}/include/axiom/math/mat4.hpp
 )
 
 # Create library target

@@ -4,6 +4,7 @@
 add_executable(axiom_tests
     math/test_vec.cpp
     math/test_vec_ops.cpp
+    math/mat4_test.cpp
 )
 
 # Link libraries
