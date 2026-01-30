@@ -2,6 +2,8 @@
 
 # Test executable
 add_executable(axiom_tests
+    core/error_code_test.cpp
+    core/result_test.cpp
     math/test_vec.cpp
     math/test_vec_ops.cpp
     math/mat4_test.cpp

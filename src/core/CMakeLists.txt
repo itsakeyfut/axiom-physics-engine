@@ -4,11 +4,14 @@
 # Source files
 set(AXIOM_CORE_SOURCES
     version.cpp
+    error_code.cpp
 )
 
 # Header files (for IDE organization)
 set(AXIOM_CORE_HEADERS
     ${CMAKE_SOURCE_DIR}/include/axiom/core/version.hpp
+    ${CMAKE_SOURCE_DIR}/include/axiom/core/error_code.hpp
+    ${CMAKE_SOURCE_DIR}/include/axiom/core/result.hpp
 )
 
 # Create library target
