@@ -370,6 +370,9 @@ bool PoolAllocator<BlockSize, Alignment>::allocateNewChunk() {
     // Link all blocks in the chunk into the free-list
     for (size_t i = 0; i < blocksPerChunk_; ++i) {
         void* block = chunk->getBlock(i, BlockSize);
+        if (!block) {
+            continue;  // Skip null blocks (should not happen)
+        }
         FreeNode* node = static_cast<FreeNode*>(block);
         node->next = freeListHead_;
         freeListHead_ = node;
