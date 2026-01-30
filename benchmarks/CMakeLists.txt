@@ -1,18 +1,18 @@
 # Axiom benchmarks
-# Benchmarks will be added as modules are implemented
 
-message(STATUS "Benchmark directory configured (benchmarks will be added in future phases)")
+# Pool allocator benchmark
+add_executable(pool_allocator_benchmark
+    pool_allocator_benchmark.cpp
+)
 
-# Example of how to add benchmarks in the future:
-# add_executable(axiom_benchmark
-#     math/benchmark_vec3.cpp
-#     math/benchmark_mat4.cpp
-#     # ...
-# )
-# target_link_libraries(axiom_benchmark
-#     PRIVATE
-#         axiom::core
-#         axiom::math
-#         benchmark::benchmark
-#         benchmark::benchmark_main
-# )
+target_link_libraries(pool_allocator_benchmark
+    PRIVATE
+        axiom_memory
+        benchmark::benchmark
+)
+
+# Set output directory
+set_target_properties(pool_allocator_benchmark
+    PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)

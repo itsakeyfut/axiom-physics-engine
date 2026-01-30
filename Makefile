@@ -126,13 +126,53 @@ test-release: build-release ## Run tests (Release)
 
 ##@ Benchmarks
 
-benchmark: build-release ## Run benchmarks
-	@echo "Running benchmarks..."
-	@$(BUILD_DIR_RELEASE)/bin/axiom_benchmark
+ifeq ($(OS),Windows_NT)
+BENCHMARK_POOL_EXE := $(BUILD_DIR_RELEASE)/bin/Debug/pool_allocator_benchmark.exe
+else
+BENCHMARK_POOL_EXE := $(BUILD_DIR_RELEASE)/bin/pool_allocator_benchmark
+endif
 
-benchmark-filter: build-release ## Run specific benchmark (usage: make benchmark-filter FILTER=Vec3)
-	@echo "Running filtered benchmarks: $(FILTER)"
-	@$(BUILD_DIR_RELEASE)/bin/axiom_benchmark --benchmark_filter=$(FILTER)
+benchmark: build-release ## Run all available benchmarks
+	@echo "Running all benchmarks..."
+	@echo ""
+	@echo "=== Pool Allocator Benchmarks ==="
+	@$(BENCHMARK_POOL_EXE) --benchmark_min_time=0.5s
+
+benchmark-pool: build-release ## Run pool allocator benchmarks (all tests, 0.5s each)
+	@echo "Running Pool Allocator benchmarks..."
+	@$(BENCHMARK_POOL_EXE) --benchmark_min_time=0.5s
+
+benchmark-pool-filter: build-release ## Run filtered pool allocator benchmarks (usage: make benchmark-pool-filter FILTER=Sequential)
+	@echo "Running filtered Pool Allocator benchmarks: $(FILTER)"
+	@$(BENCHMARK_POOL_EXE) --benchmark_filter=$(FILTER) --benchmark_min_time=0.5s
+
+benchmark-pool-quick: build-release ## Run pool allocator benchmarks (quick, minimal iterations)
+	@echo "Running Pool Allocator benchmarks (quick mode)..."
+	@$(BENCHMARK_POOL_EXE) --benchmark_min_time=0.1s
+
+benchmark-pool-peak: build-release ## Run pool allocator peak throughput benchmarks
+	@echo "Running Pool Allocator peak throughput benchmarks..."
+	@$(BENCHMARK_POOL_EXE) --benchmark_filter=PeakThroughput --benchmark_min_time=1s
+
+benchmark-pool-compare: build-release ## Compare pool allocator vs heap/std allocators (8192 items + peak)
+	@echo "Comparing Pool Allocator performance..."
+	@$(BENCHMARK_POOL_EXE) --benchmark_filter="Sequential_Small/8192|PeakThroughput" --benchmark_min_time=1s
+
+benchmark-pool-small: build-release ## Benchmark small object allocations
+	@echo "Running small object benchmarks..."
+	@$(BENCHMARK_POOL_EXE) --benchmark_filter="Small" --benchmark_min_time=0.5s
+
+benchmark-pool-medium: build-release ## Benchmark medium object allocations
+	@echo "Running medium object benchmarks..."
+	@$(BENCHMARK_POOL_EXE) --benchmark_filter="Medium" --benchmark_min_time=0.5s
+
+benchmark-pool-large: build-release ## Benchmark large object allocations
+	@echo "Running large object benchmarks..."
+	@$(BENCHMARK_POOL_EXE) --benchmark_filter="Large" --benchmark_min_time=0.5s
+
+benchmark-list: ## List all available benchmark executables
+	@echo "Available benchmark executables:"
+	@echo "  - pool_allocator_benchmark"
 
 ##@ Examples
 
