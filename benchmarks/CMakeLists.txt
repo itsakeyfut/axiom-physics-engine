@@ -33,3 +33,20 @@ set_target_properties(linear_allocator_benchmark
     PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
+
+# Stack allocator benchmark
+add_executable(stack_allocator_benchmark
+    memory/stack_allocator_benchmark.cpp
+)
+
+target_link_libraries(stack_allocator_benchmark
+    PRIVATE
+        axiom_memory
+        benchmark::benchmark
+)
+
+# Set output directory
+set_target_properties(stack_allocator_benchmark
+    PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
