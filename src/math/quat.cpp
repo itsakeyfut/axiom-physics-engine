@@ -120,9 +120,9 @@ Mat4 Quat::toMatrix() const noexcept {
 
     // Convert glm::mat4 to Mat4
     Mat4 result;
-    for (int col = 0; col < 4; ++col) {
-        for (int row = 0; row < 4; ++row) {
-            result.at(row, col) = mat[col][row];
+    for (glm::length_t col = 0; col < 4; ++col) {
+        for (glm::length_t row = 0; row < 4; ++row) {
+            result.at(static_cast<size_t>(row), static_cast<size_t>(col)) = mat[col][row];
         }
     }
     return result;
