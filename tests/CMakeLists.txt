@@ -11,6 +11,7 @@ add_executable(axiom_tests
     math/aabb_test.cpp
     math/utils_test.cpp
     math/random_test.cpp
+    memory/allocator_test.cpp
 )
 
 # Link libraries
@@ -18,6 +19,7 @@ target_link_libraries(axiom_tests
     PRIVATE
         axiom::math
         axiom::core
+        axiom::memory
         GTest::gtest
         GTest::gtest_main
 )
