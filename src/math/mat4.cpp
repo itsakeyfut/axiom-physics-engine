@@ -1,5 +1,6 @@
 #include "axiom/math/mat4.hpp"
 
+#include "axiom/math/quat.hpp"
 #include "axiom/math/vec3.hpp"
 #include "axiom/math/vec4.hpp"
 
@@ -152,10 +153,8 @@ Mat4 Mat4::translation(const Vec3& t) noexcept {
     return fromGLM(mat);
 }
 
-Mat4 Mat4::rotation(const Quat& /* q */) noexcept {
-    // Quaternion not implemented yet, will be added in Issue #10
-    // For now, return identity
-    return identity();
+Mat4 Mat4::rotation(const Quat& q) noexcept {
+    return q.toMatrix();
 }
 
 Mat4 Mat4::rotationX(float angleRadians) noexcept {
