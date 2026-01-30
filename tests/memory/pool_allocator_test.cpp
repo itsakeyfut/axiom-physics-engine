@@ -43,7 +43,7 @@ public:
 
 private:
     int value_;
-    int padding_;  // Ensure size >= sizeof(void*)
+    [[maybe_unused]] int padding_;  // Ensure size >= sizeof(void*)
 };
 
 int TrackedObject::constructCount_ = 0;
@@ -605,7 +605,7 @@ TEST(PoolAllocatorTest, SizeCapacityConsistency) {
     EXPECT_GE(pool.capacity(), 32);  // At least one chunk
 
     // Deallocate 5 blocks
-    for (int i = 0; i < 5; ++i) {
+    for (size_t i = 0; i < 5; ++i) {
         pool.deallocate(ptrs[i], 64);
     }
 
@@ -613,7 +613,7 @@ TEST(PoolAllocatorTest, SizeCapacityConsistency) {
     EXPECT_GE(pool.capacity(), 32);  // Capacity unchanged
 
     // Deallocate remaining
-    for (int i = 5; i < 10; ++i) {
+    for (size_t i = 5; i < 10; ++i) {
         pool.deallocate(ptrs[i], 64);
     }
 
@@ -660,7 +660,7 @@ TEST(PoolAllocatorTest, RandomAllocationPattern) {
     ptrs.reserve(100);
 
     // Randomly allocate and deallocate
-    for (int iteration = 0; iteration < 500; ++iteration) {
+    for (size_t iteration = 0; iteration < 500; ++iteration) {
         if (ptrs.empty() || (ptrs.size() < 100 && iteration % 3 != 0)) {
             // Allocate
             void* ptr = pool.allocate(32, 8);
@@ -670,7 +670,7 @@ TEST(PoolAllocatorTest, RandomAllocationPattern) {
             // Deallocate random element
             size_t index = iteration % ptrs.size();
             pool.deallocate(ptrs[index], 32);
-            ptrs.erase(ptrs.begin() + index);
+            ptrs.erase(ptrs.begin() + static_cast<std::ptrdiff_t>(index));
         }
     }
 

@@ -33,7 +33,7 @@ static void BM_PoolAllocator_Sequential_Small(benchmark::State& state) {
 
     for (auto _ : state) {
         std::vector<void*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         // Allocate
         for (int64_t i = 0; i < state.range(0); ++i) {
@@ -57,7 +57,7 @@ static void BM_HeapAllocator_Sequential_Small(benchmark::State& state) {
 
     for (auto _ : state) {
         std::vector<void*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         // Allocate
         for (int64_t i = 0; i < state.range(0); ++i) {
@@ -79,7 +79,7 @@ BENCHMARK(BM_HeapAllocator_Sequential_Small)->Range(8, 8192);
 static void BM_StdAllocator_Sequential_Small(benchmark::State& state) {
     for (auto _ : state) {
         std::vector<SmallObject*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         // Allocate
         for (int64_t i = 0; i < state.range(0); ++i) {
@@ -107,7 +107,7 @@ static void BM_PoolAllocator_Sequential_Medium(benchmark::State& state) {
 
     for (auto _ : state) {
         std::vector<void*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         for (int64_t i = 0; i < state.range(0); ++i) {
             void* ptr = pool.allocate(sizeof(MediumObject), alignof(MediumObject));
@@ -129,7 +129,7 @@ static void BM_HeapAllocator_Sequential_Medium(benchmark::State& state) {
 
     for (auto _ : state) {
         std::vector<void*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         for (int64_t i = 0; i < state.range(0); ++i) {
             void* ptr = heap.allocate(sizeof(MediumObject), alignof(MediumObject));
@@ -149,7 +149,7 @@ BENCHMARK(BM_HeapAllocator_Sequential_Medium)->Range(8, 8192);
 static void BM_StdAllocator_Sequential_Medium(benchmark::State& state) {
     for (auto _ : state) {
         std::vector<MediumObject*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         for (int64_t i = 0; i < state.range(0); ++i) {
             MediumObject* ptr = new MediumObject();
@@ -223,7 +223,7 @@ static void BM_PoolAllocator_Interleaved(benchmark::State& state) {
 
     for (auto _ : state) {
         std::vector<void*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         // Allocate half
         for (int64_t i = 0; i < state.range(0) / 2; ++i) {
@@ -242,8 +242,9 @@ static void BM_PoolAllocator_Interleaved(benchmark::State& state) {
         for (int64_t i = 0; i < state.range(0) / 2; ++i) {
             void* ptr = pool.allocate(sizeof(MediumObject), alignof(MediumObject));
             benchmark::DoNotOptimize(ptr);
-            if (ptrs[i * 2] == nullptr) {
-                ptrs[i * 2] = ptr;
+            const size_t idx = static_cast<size_t>(i * 2);
+            if (ptrs[idx] == nullptr) {
+                ptrs[idx] = ptr;
             } else {
                 ptrs.push_back(ptr);
             }
@@ -266,7 +267,7 @@ static void BM_HeapAllocator_Interleaved(benchmark::State& state) {
 
     for (auto _ : state) {
         std::vector<void*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         for (int64_t i = 0; i < state.range(0) / 2; ++i) {
             void* ptr = heap.allocate(sizeof(MediumObject), alignof(MediumObject));
@@ -282,8 +283,9 @@ static void BM_HeapAllocator_Interleaved(benchmark::State& state) {
         for (int64_t i = 0; i < state.range(0) / 2; ++i) {
             void* ptr = heap.allocate(sizeof(MediumObject), alignof(MediumObject));
             benchmark::DoNotOptimize(ptr);
-            if (ptrs[i * 2] == nullptr) {
-                ptrs[i * 2] = ptr;
+            const size_t idx = static_cast<size_t>(i * 2);
+            if (ptrs[idx] == nullptr) {
+                ptrs[idx] = ptr;
             } else {
                 ptrs.push_back(ptr);
             }
@@ -310,7 +312,7 @@ static void BM_PoolAllocator_Reserve(benchmark::State& state) {
         PoolAllocator<sizeof(MediumObject), alignof(MediumObject)> pool(256);
         state.ResumeTiming();
 
-        pool.reserve(state.range(0));
+        pool.reserve(static_cast<size_t>(state.range(0)));
 
         benchmark::DoNotOptimize(pool.capacity());
     }
@@ -326,7 +328,7 @@ static void BM_PoolAllocator_Sequential_Large(benchmark::State& state) {
 
     for (auto _ : state) {
         std::vector<void*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         for (int64_t i = 0; i < state.range(0); ++i) {
             void* ptr = pool.allocate(sizeof(LargeObject), alignof(LargeObject));
@@ -348,7 +350,7 @@ static void BM_HeapAllocator_Sequential_Large(benchmark::State& state) {
 
     for (auto _ : state) {
         std::vector<void*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         for (int64_t i = 0; i < state.range(0); ++i) {
             void* ptr = heap.allocate(sizeof(LargeObject), alignof(LargeObject));
@@ -368,7 +370,7 @@ BENCHMARK(BM_HeapAllocator_Sequential_Large)->Range(8, 2048);
 static void BM_StdAllocator_Sequential_Large(benchmark::State& state) {
     for (auto _ : state) {
         std::vector<LargeObject*> ptrs;
-        ptrs.reserve(state.range(0));
+        ptrs.reserve(static_cast<size_t>(state.range(0)));
 
         for (int64_t i = 0; i < state.range(0); ++i) {
             LargeObject* ptr = new LargeObject();

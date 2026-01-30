@@ -210,7 +210,7 @@ private:
         void* memory;        ///< Pointer to chunk memory (aligned)
         size_t blockCount;   ///< Number of blocks in this chunk
 
-        Chunk(size_t blockCount, size_t blockSize, size_t alignment);
+        Chunk(size_t numBlocks, size_t blockSize, size_t alignment);
         ~Chunk();
 
         // Disable copy and move
@@ -386,10 +386,10 @@ bool PoolAllocator<BlockSize, Alignment>::allocateNewChunk() {
 // ============================================================================
 
 template <size_t BlockSize, size_t Alignment>
-PoolAllocator<BlockSize, Alignment>::Chunk::Chunk(size_t blockCount, size_t blockSize,
+PoolAllocator<BlockSize, Alignment>::Chunk::Chunk(size_t numBlocks, size_t blockSize,
                                                     size_t alignment)
-    : memory(nullptr), blockCount(blockCount) {
-    const size_t totalSize = blockCount * blockSize;
+    : memory(nullptr), blockCount(numBlocks) {
+    const size_t totalSize = numBlocks * blockSize;
     memory = alignedAlloc(totalSize, alignment);
 }
 
