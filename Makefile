@@ -70,6 +70,14 @@ build-debug: configure-debug ## Build Debug configuration
 
 rebuild-debug: clean-debug build-debug ## Clean and rebuild Debug
 
+configure-debug-ninja: ## Configure Debug build with Ninja (for clang-tidy)
+	@echo "Configuring Debug build with Ninja..."
+	@cmd.exe /c .\configure-ninja.bat
+
+build-debug-ninja: configure-debug-ninja ## Build Debug with Ninja
+	@echo "Building Debug with Ninja..."
+	@cmd.exe /c .\build-ninja.bat
+
 ##@ Build (Release)
 
 configure-release: ## Configure Release build
@@ -146,13 +154,21 @@ format-check: ## Check if code is properly formatted
 	@echo "Checking code format..."
 	@find src include tests benchmarks examples -name "*.cpp" -o -name "*.hpp" -o -name "*.h" | xargs clang-format --dry-run -Werror
 
-lint: ## Run clang-tidy static analysis
+lint: configure-debug-ninja ## Run clang-tidy static analysis
 	@echo "Running clang-tidy..."
+	@find src tests examples -name "*.cpp" | xargs clang-tidy -p build/windows-debug-ninja
+
+lint-fix: configure-debug-ninja ## Run clang-tidy with automatic fixes
+	@echo "Running clang-tidy with fixes..."
+	@find src tests examples -name "*.cpp" | xargs clang-tidy -p build/windows-debug-ninja -fix
+
+lint-src: ## Run clang-tidy on source files only
+	@echo "Running clang-tidy on source files..."
 	@find src -name "*.cpp" | xargs clang-tidy -p $(BUILD_DIR_DEBUG)
 
-lint-fix: ## Run clang-tidy with automatic fixes
-	@echo "Running clang-tidy with fixes..."
-	@find src -name "*.cpp" | xargs clang-tidy -p $(BUILD_DIR_DEBUG) -fix
+lint-tests: ## Run clang-tidy on test files only
+	@echo "Running clang-tidy on test files..."
+	@find tests -name "*.cpp" | xargs clang-tidy -p $(BUILD_DIR_DEBUG)
 
 ##@ Cleaning
 
