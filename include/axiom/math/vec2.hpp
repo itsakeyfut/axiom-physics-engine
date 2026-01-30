@@ -3,8 +3,7 @@
 #include <cmath>
 #include <cstddef>
 
-namespace axiom {
-namespace math {
+namespace axiom::math {
 
 /**
  * @brief 2D vector class with x and y components
@@ -190,5 +189,4 @@ constexpr Vec2 operator*(float scalar, const Vec2& vec) noexcept {
     return vec * scalar;
 }
 
-}  // namespace math
-}  // namespace axiom
+}  // namespace axiom::math

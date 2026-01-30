@@ -3,8 +3,7 @@
 #include <cmath>
 #include <cstddef>
 
-namespace axiom {
-namespace math {
+namespace axiom::math {
 
 /**
  * @brief 3D vector class with x, y, and z components
@@ -278,5 +277,4 @@ constexpr Vec3 cross(const Vec3& a, const Vec3& b) noexcept {
     return a.cross(b);
 }
 
-}  // namespace math
-}  // namespace axiom
+}  // namespace axiom::math

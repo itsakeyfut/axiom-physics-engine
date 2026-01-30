@@ -7,8 +7,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace axiom {
-namespace math {
+namespace axiom::math {
 
 // ============================================================================
 // Dot Product
@@ -507,5 +506,4 @@ inline Vec4 round(const Vec4& v) noexcept {
     return Vec4(std::round(v.x), std::round(v.y), std::round(v.z), std::round(v.w));
 }
 
-}  // namespace math
-}  // namespace axiom
+}  // namespace axiom::math
