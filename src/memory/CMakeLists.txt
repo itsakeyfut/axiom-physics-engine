@@ -4,6 +4,7 @@
 set(AXIOM_MEMORY_SOURCES
     heap_allocator.cpp
     linear_allocator.cpp
+    stack_allocator.cpp
 )
 
 # Create memory library
