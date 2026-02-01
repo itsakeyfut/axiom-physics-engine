@@ -1,15 +1,18 @@
 # Axiom examples
-# Example programs will be added as modules are implemented
+# Example programs demonstrating library usage
 
-message(STATUS "Examples directory configured (examples will be added in future phases)")
+# Profiling example - demonstrates profiling infrastructure
+add_executable(profiling_example
+    profiling_example.cpp
+)
 
-# Example of how to add examples in the future:
-# add_executable(simple_simulation
-#     simple_simulation.cpp
-# )
-# target_link_libraries(simple_simulation
-#     PRIVATE
-#         axiom::core
-#         axiom::math
-#         axiom::dynamics
-# )
+target_link_libraries(profiling_example
+    PRIVATE
+        axiom::core
+)
+
+set_target_properties(profiling_example PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
+message(STATUS "Examples configured: profiling_example")

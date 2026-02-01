@@ -21,7 +21,7 @@ cmake --preset windows-release
 cmake --build build/windows-release
 
 # Build with Tracy Profiler enabled
-cmake --preset windows-relwithdebinfo -DAXIOM_ENABLE_TRACY=ON
+cmake --preset windows-relwithdebinfo -DAXIOM_ENABLE_PROFILING=ON
 cmake --build build/windows-relwithdebinfo
 ```
 
@@ -95,7 +95,70 @@ Use `#pragma once`
 - **Single library output**: All modules compiled into `axiom.lib/axiom.dll`
 - **GPU implementations**: Located in `gpu/` subdirectory within each module
 - **Error handling**: Graceful recovery, no exceptions
-- **Profiling**: Tracy integration (enable with `AXIOM_ENABLE_TRACY`)
+- **Profiling**: Tracy integration (enable with `AXIOM_ENABLE_PROFILING`)
+
+## Profiling
+
+The engine integrates with Tracy Profiler for performance analysis. Profiling macros are available in `axiom/core/profiler.hpp`.
+
+### Build with Profiling
+
+```bash
+# Enable profiling in CMake configuration
+cmake --preset windows-relwithdebinfo -DAXIOM_ENABLE_PROFILING=ON
+cmake --build build/windows-relwithdebinfo
+
+# Install Tracy dependency (if not already installed)
+vcpkg install --features=tracy
+```
+
+### Usage
+
+```cpp
+#include <axiom/core/profiler.hpp>
+
+void PhysicsWorld::step(float dt) {
+    AXIOM_PROFILE_FUNCTION();  // Profile entire function
+
+    {
+        AXIOM_PROFILE_SCOPE("Broadphase");
+        broadphase_.update();
+        AXIOM_PROFILE_VALUE("BroadphasePairs", broadphase_.getPairCount());
+    }
+
+    {
+        AXIOM_PROFILE_SCOPE("Narrowphase");
+        narrowphase_.detectCollisions();
+        AXIOM_PROFILE_VALUE("ContactCount", narrowphase_.getContactCount());
+    }
+
+    AXIOM_PROFILE_FRAME();  // Mark end of frame
+}
+```
+
+### Available Macros
+
+- `AXIOM_PROFILE_FRAME()` - Mark frame boundary for per-frame statistics
+- `AXIOM_PROFILE_SCOPE(name)` - Profile a named scope (RAII)
+- `AXIOM_PROFILE_FUNCTION()` - Profile current function (uses `__FUNCTION__`)
+- `AXIOM_PROFILE_VALUE(name, val)` - Plot numeric value over time
+- `AXIOM_PROFILE_TAG(name, val)` - Add text annotation to current zone
+- `AXIOM_PROFILE_ALLOC(ptr, size)` - Track memory allocation
+- `AXIOM_PROFILE_FREE(ptr)` - Track memory deallocation
+- `AXIOM_PROFILE_GPU_ZONE(ctx, name)` - Profile GPU work (Vulkan)
+- `AXIOM_PROFILE_GPU_COLLECT(ctx)` - Collect GPU profiling data
+
+When `AXIOM_ENABLE_PROFILING` is not defined, all macros expand to no-ops with zero runtime cost.
+
+### Viewing Results
+
+1. Build the project with profiling enabled
+2. Run the Tracy server application
+3. Launch your application
+4. Tracy will automatically connect and display profiling data
+5. Results can be exported to Chrome Tracing format for visualization in `chrome://tracing`
+
+See [Tracy documentation](https://github.com/wolfpld/tracy) for more details.
 
 ## Documentation
 

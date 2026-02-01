@@ -14,6 +14,7 @@ set(AXIOM_CORE_HEADERS
     ${CMAKE_SOURCE_DIR}/include/axiom/core/error_code.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/core/result.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/core/assert.hpp
+    ${CMAKE_SOURCE_DIR}/include/axiom/core/profiler.hpp
 )
 
 # Create library target
@@ -44,6 +45,11 @@ target_link_libraries(axiom_core
     PRIVATE
         # Internal dependencies
 )
+
+# Conditionally link Tracy profiler
+if(AXIOM_ENABLE_PROFILING)
+    target_link_libraries(axiom_core PUBLIC Tracy::TracyClient)
+endif()
 
 # Compile features
 target_compile_features(axiom_core PUBLIC cxx_std_20)
