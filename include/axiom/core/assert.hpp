@@ -23,9 +23,7 @@ void setAssertHandler(AssertHandler handler) noexcept;
 /// @param msg Optional message describing the failure
 /// @param file Source file where the assertion failed
 /// @param line Line number where the assertion failed
-[[noreturn]] void defaultAssertHandler(const char* expr,
-                                       const char* msg,
-                                       const char* file,
+[[noreturn]] void defaultAssertHandler(const char* expr, const char* msg, const char* file,
                                        int line) noexcept;
 
 /// Internal function called when an assertion fails
@@ -33,9 +31,7 @@ void setAssertHandler(AssertHandler handler) noexcept;
 /// @param msg Optional message describing the failure
 /// @param file Source file where the assertion failed
 /// @param line Line number where the assertion failed
-[[noreturn]] void assertionFailed(const char* expr,
-                                  const char* msg,
-                                  const char* file,
+[[noreturn]] void assertionFailed(const char* expr, const char* msg, const char* file,
                                   int line) noexcept;
 
 }  // namespace axiom::core
@@ -80,11 +76,11 @@ void setAssertHandler(AssertHandler handler) noexcept;
 //=============================================================================
 
 #if AXIOM_ASSERTIONS_ENABLED
-#define AXIOM_ASSERT(expr, msg)                                                              \
-    do {                                                                                     \
-        if (!(expr)) {                                                                       \
-            ::axiom::core::assertionFailed(#expr, msg, __FILE__, __LINE__);                 \
-        }                                                                                    \
+#define AXIOM_ASSERT(expr, msg)                                                                    \
+    do {                                                                                           \
+        if (!(expr)) {                                                                             \
+            ::axiom::core::assertionFailed(#expr, msg, __FILE__, __LINE__);                        \
+        }                                                                                          \
     } while (false)
 #else
 #define AXIOM_ASSERT(expr, msg) ((void)0)
@@ -97,11 +93,11 @@ void setAssertHandler(AssertHandler handler) noexcept;
 // - The expression is always evaluated (side effects are preserved)
 //=============================================================================
 
-#define AXIOM_VERIFY(expr, msg)                                                              \
-    do {                                                                                     \
-        if (!(expr)) {                                                                       \
-            ::axiom::core::assertionFailed(#expr, msg, __FILE__, __LINE__);                 \
-        }                                                                                    \
+#define AXIOM_VERIFY(expr, msg)                                                                    \
+    do {                                                                                           \
+        if (!(expr)) {                                                                             \
+            ::axiom::core::assertionFailed(#expr, msg, __FILE__, __LINE__);                        \
+        }                                                                                          \
     } while (false)
 
 //=============================================================================
@@ -112,12 +108,11 @@ void setAssertHandler(AssertHandler handler) noexcept;
 //=============================================================================
 
 #if AXIOM_ASSERTIONS_ENABLED
-#define AXIOM_PRECONDITION(expr)                                                             \
-    do {                                                                                     \
-        if (!(expr)) {                                                                       \
-            ::axiom::core::assertionFailed(#expr, "Precondition violated", __FILE__,        \
-                                           __LINE__);                                        \
-        }                                                                                    \
+#define AXIOM_PRECONDITION(expr)                                                                   \
+    do {                                                                                           \
+        if (!(expr)) {                                                                             \
+            ::axiom::core::assertionFailed(#expr, "Precondition violated", __FILE__, __LINE__);    \
+        }                                                                                          \
     } while (false)
 #else
 #define AXIOM_PRECONDITION(expr) ((void)0)
@@ -131,12 +126,11 @@ void setAssertHandler(AssertHandler handler) noexcept;
 //=============================================================================
 
 #if AXIOM_ASSERTIONS_ENABLED
-#define AXIOM_POSTCONDITION(expr)                                                            \
-    do {                                                                                     \
-        if (!(expr)) {                                                                       \
-            ::axiom::core::assertionFailed(#expr, "Postcondition violated", __FILE__,       \
-                                           __LINE__);                                        \
-        }                                                                                    \
+#define AXIOM_POSTCONDITION(expr)                                                                  \
+    do {                                                                                           \
+        if (!(expr)) {                                                                             \
+            ::axiom::core::assertionFailed(#expr, "Postcondition violated", __FILE__, __LINE__);   \
+        }                                                                                          \
     } while (false)
 #else
 #define AXIOM_POSTCONDITION(expr) ((void)0)
@@ -150,10 +144,9 @@ void setAssertHandler(AssertHandler handler) noexcept;
 //=============================================================================
 
 #if AXIOM_ASSERTIONS_ENABLED
-#define AXIOM_UNREACHABLE()                                                                  \
-    do {                                                                                     \
-        ::axiom::core::assertionFailed("false", "Unreachable code reached", __FILE__,       \
-                                       __LINE__);                                            \
+#define AXIOM_UNREACHABLE()                                                                        \
+    do {                                                                                           \
+        ::axiom::core::assertionFailed("false", "Unreachable code reached", __FILE__, __LINE__);   \
     } while (false)
 #else
 // In Release builds, use compiler-specific unreachable hints

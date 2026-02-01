@@ -1,7 +1,7 @@
 #pragma once
 
-#include "axiom/core/error_code.hpp"
 #include "axiom/core/assert.hpp"
+#include "axiom/core/error_code.hpp"
 
 #include <type_traits>
 #include <utility>

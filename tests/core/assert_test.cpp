@@ -29,11 +29,7 @@ protected:
 
 TEST_F(AssertTest, AssertMacroFailsOnFalseCondition) {
 #if AXIOM_ASSERTIONS_ENABLED
-    EXPECT_DEATH(
-        {
-            AXIOM_ASSERT(false, "Test assertion failure");
-        },
-        "Test assertion failure");
+    EXPECT_DEATH({ AXIOM_ASSERT(false, "Test assertion failure"); }, "Test assertion failure");
 #else
     GTEST_SKIP() << "Assertions disabled in this build";
 #endif
@@ -48,11 +44,7 @@ TEST_F(AssertTest, AssertMacroPassesOnTrueCondition) {
 
 TEST_F(AssertTest, PreconditionFailsOnViolation) {
 #if AXIOM_ASSERTIONS_ENABLED
-    EXPECT_DEATH(
-        {
-            AXIOM_PRECONDITION(false);
-        },
-        "Precondition violated");
+    EXPECT_DEATH({ AXIOM_PRECONDITION(false); }, "Precondition violated");
 #else
     GTEST_SKIP() << "Assertions disabled in this build";
 #endif
@@ -66,11 +58,7 @@ TEST_F(AssertTest, PreconditionPassesOnValidCondition) {
 
 TEST_F(AssertTest, PostconditionFailsOnViolation) {
 #if AXIOM_ASSERTIONS_ENABLED
-    EXPECT_DEATH(
-        {
-            AXIOM_POSTCONDITION(false);
-        },
-        "Postcondition violated");
+    EXPECT_DEATH({ AXIOM_POSTCONDITION(false); }, "Postcondition violated");
 #else
     GTEST_SKIP() << "Assertions disabled in this build";
 #endif
@@ -84,11 +72,7 @@ TEST_F(AssertTest, PostconditionPassesOnValidCondition) {
 
 TEST_F(AssertTest, UnreachableAborts) {
 #if AXIOM_ASSERTIONS_ENABLED
-    EXPECT_DEATH(
-        {
-            AXIOM_UNREACHABLE();
-        },
-        "Unreachable code reached");
+    EXPECT_DEATH({ AXIOM_UNREACHABLE(); }, "Unreachable code reached");
 #else
     GTEST_SKIP() << "Assertions disabled in this build";
 #endif
@@ -108,9 +92,7 @@ TEST_F(AssertTest, AssertIsNoOpInReleaseBuild) {
 // AXIOM_VERIFY is always enabled
 TEST_F(AssertTest, VerifyAlwaysEnabled) {
     EXPECT_DEATH(
-        {
-            AXIOM_VERIFY(false, "Verify should always be enabled");
-        },
+        { AXIOM_VERIFY(false, "Verify should always be enabled"); },
         "Verify should always be enabled");
 }
 
@@ -137,9 +119,7 @@ TEST_F(AssertTest, CustomAssertHandlerIsCalled) {
     axiom::core::setAssertHandler(customHandler);
 
     EXPECT_DEATH(
-        {
-            AXIOM_VERIFY(false, "Custom handler test");
-        },
+        { AXIOM_VERIFY(false, "Custom handler test"); },
         "");  // Will still abort after handler returns
 
     // Note: We can't check handlerCalled here because EXPECT_DEATH runs in a child process
@@ -170,11 +150,7 @@ TEST_F(AssertTest, AssertWithComplexExpression) {
     AXIOM_ASSERT((x + y) == 30, "Arithmetic expression");
 
     // Should fail
-    EXPECT_DEATH(
-        {
-            AXIOM_ASSERT(x > y, "x should be less than y");
-        },
-        "x > y");
+    EXPECT_DEATH({ AXIOM_ASSERT(x > y, "x should be less than y"); }, "x > y");
 }
 
 TEST_F(AssertTest, PreconditionValidatesPointers) {
@@ -186,11 +162,7 @@ TEST_F(AssertTest, PreconditionValidatesPointers) {
     AXIOM_PRECONDITION(ptr != nullptr);
 
     // Should fail
-    EXPECT_DEATH(
-        {
-            AXIOM_PRECONDITION(nullPtr != nullptr);
-        },
-        "Precondition violated");
+    EXPECT_DEATH({ AXIOM_PRECONDITION(nullPtr != nullptr); }, "Precondition violated");
 }
 
 TEST_F(AssertTest, PostconditionValidatesReturnValues) {
@@ -206,11 +178,7 @@ TEST_F(AssertTest, PostconditionValidatesReturnValues) {
     EXPECT_EQ(divide(7, 3), 2);
 
     // Should fail on precondition
-    EXPECT_DEATH(
-        {
-            divide(10, 0);
-        },
-        "Precondition violated");
+    EXPECT_DEATH({ divide(10, 0); }, "Precondition violated");
 }
 
 #endif  // AXIOM_ASSERTIONS_ENABLED
@@ -220,9 +188,7 @@ TEST_F(AssertTest, PostconditionValidatesReturnValues) {
 
 TEST_F(AssertTest, AssertionMessageIsDisplayed) {
     EXPECT_DEATH(
-        {
-            AXIOM_ASSERT(false, "This is a custom error message");
-        },
+        { AXIOM_ASSERT(false, "This is a custom error message"); },
         "This is a custom error message");
 }
 
@@ -237,11 +203,7 @@ TEST_F(AssertTest, AssertionDisplaysExpression) {
 }
 
 TEST_F(AssertTest, AssertionDisplaysFileAndLine) {
-    EXPECT_DEATH(
-        {
-            AXIOM_ASSERT(false, "File and line test");
-        },
-        "assert_test.cpp");
+    EXPECT_DEATH({ AXIOM_ASSERT(false, "File and line test"); }, "assert_test.cpp");
 }
 
 #endif  // AXIOM_ASSERTIONS_ENABLED
@@ -259,11 +221,7 @@ TEST_F(AssertTest, AssertionsWorkInFunctions) {
 
     EXPECT_EQ(testFunction(5), 10);
 
-    EXPECT_DEATH(
-        {
-            testFunction(-5);
-        },
-        "Precondition violated");
+    EXPECT_DEATH({ testFunction(-5); }, "Precondition violated");
 }
 
 TEST_F(AssertTest, AssertionsWorkInTemplates) {
@@ -299,9 +257,7 @@ TEST_F(AssertTest, ResultValueAssertionOnFailure) {
 
     // Accessing value on failed Result should assert
     EXPECT_DEATH(
-        {
-            [[maybe_unused]] auto value = result.value();
-        },
+        { [[maybe_unused]] auto value = result.value(); },
         "Attempted to get value from failed Result");
 }
 

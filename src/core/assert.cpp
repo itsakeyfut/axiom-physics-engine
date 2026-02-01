@@ -6,13 +6,13 @@
 
 // Platform-specific headers for stack trace
 #ifdef AXIOM_PLATFORM_WINDOWS
-#include <windows.h>
 #include <dbghelp.h>
+#include <windows.h>
 #pragma comment(lib, "dbghelp.lib")
 #elif defined(AXIOM_PLATFORM_LINUX) || defined(AXIOM_PLATFORM_MACOS)
-#include <execinfo.h>
 #include <cxxabi.h>
 #include <dlfcn.h>
+#include <execinfo.h>
 #endif
 
 namespace axiom::core {
@@ -110,15 +110,14 @@ void setAssertHandler(AssertHandler handler) noexcept {
     g_assertHandler.store(handler, std::memory_order_relaxed);
 }
 
-void defaultAssertHandler(const char* expr,
-                          const char* msg,
-                          const char* file,
-                          int line) noexcept {
+void defaultAssertHandler(const char* expr, const char* msg, const char* file, int line) noexcept {
     // Print assertion failure information
     fprintf(stderr, "\n");
-    fprintf(stderr, "================================================================================\n");
+    fprintf(stderr,
+            "================================================================================\n");
     fprintf(stderr, "ASSERTION FAILED\n");
-    fprintf(stderr, "================================================================================\n");
+    fprintf(stderr,
+            "================================================================================\n");
     fprintf(stderr, "Expression: %s\n", expr);
     if (msg && msg[0] != '\0') {
         fprintf(stderr, "Message:    %s\n", msg);
@@ -128,7 +127,8 @@ void defaultAssertHandler(const char* expr,
     // Print stack trace
     printStackTrace();
 
-    fprintf(stderr, "================================================================================\n");
+    fprintf(stderr,
+            "================================================================================\n");
     fflush(stderr);
 
     // Abort the program
