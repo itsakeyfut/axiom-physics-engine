@@ -104,9 +104,9 @@ TEST_F(AssertTest, VerifyPassesOnTrueCondition) {
 
 // Test custom assertion handler
 TEST_F(AssertTest, CustomAssertHandlerIsCalled) {
-    static bool handlerCalled = false;
-    static const char* capturedExpr = nullptr;
-    static const char* capturedMsg = nullptr;
+    [[maybe_unused]] static bool handlerCalled = false;
+    [[maybe_unused]] static const char* capturedExpr = nullptr;
+    [[maybe_unused]] static const char* capturedMsg = nullptr;
 
     auto customHandler = [](const char* expr, const char* msg, const char* /*file*/, int /*line*/) {
         handlerCalled = true;
