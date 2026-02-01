@@ -114,15 +114,15 @@ all: build-debug build-release ## Build both Debug and Release
 
 test: build-debug ## Run all tests (Debug)
 	@echo "Running tests..."
-	@ctest --preset $(PRESET_DEBUG) --output-on-failure
+	@cd $(BUILD_DIR_DEBUG) && ctest -C Debug --output-on-failure
 
 test-verbose: build-debug ## Run tests with verbose output
 	@echo "Running tests (verbose)..."
-	@ctest --preset $(PRESET_DEBUG) --verbose
+	@cd $(BUILD_DIR_DEBUG) && ctest -C Debug --verbose
 
 test-release: build-release ## Run tests (Release)
 	@echo "Running tests (Release)..."
-	@cd $(BUILD_DIR_RELEASE) && ctest --output-on-failure
+	@cd $(BUILD_DIR_RELEASE) && ctest -C Release --output-on-failure
 
 ##@ Benchmarks
 
@@ -284,7 +284,7 @@ dev-rebuild: clean build-debug test ## Clean rebuild with tests
 
 quick-test: ## Quick build and test (no configure)
 	@cmake --build $(BUILD_DIR_DEBUG) --parallel
-	@ctest --preset $(PRESET_DEBUG) --output-on-failure
+	@cd $(BUILD_DIR_DEBUG) && ctest -C Debug --output-on-failure
 
 quick-build: ## Quick build without configure
 	@cmake --build $(BUILD_DIR_DEBUG) --parallel

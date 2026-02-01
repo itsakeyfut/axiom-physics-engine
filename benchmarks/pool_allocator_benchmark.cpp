@@ -243,7 +243,7 @@ static void BM_PoolAllocator_Interleaved(benchmark::State& state) {
             void* ptr = pool.allocate(sizeof(MediumObject), alignof(MediumObject));
             benchmark::DoNotOptimize(ptr);
             const size_t idx = static_cast<size_t>(i * 2);
-            if (ptrs[idx] == nullptr) {
+            if (idx < ptrs.size() && ptrs[idx] == nullptr) {
                 ptrs[idx] = ptr;
             } else {
                 ptrs.push_back(ptr);
@@ -284,7 +284,7 @@ static void BM_HeapAllocator_Interleaved(benchmark::State& state) {
             void* ptr = heap.allocate(sizeof(MediumObject), alignof(MediumObject));
             benchmark::DoNotOptimize(ptr);
             const size_t idx = static_cast<size_t>(i * 2);
-            if (ptrs[idx] == nullptr) {
+            if (idx < ptrs.size() && ptrs[idx] == nullptr) {
                 ptrs[idx] = ptr;
             } else {
                 ptrs.push_back(ptr);
