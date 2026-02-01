@@ -66,6 +66,7 @@ public:
         }
 
         AXIOM_PROFILE_VALUE("BroadphasePairs", static_cast<double>(pairCount));
+        (void)pairCount;  // Suppress unused variable warning when profiling disabled
     }
 };
 
