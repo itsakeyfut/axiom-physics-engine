@@ -65,7 +65,7 @@ public:
             }
         }
 
-        AXIOM_PROFILE_VALUE("BroadphasePairs", pairCount);
+        AXIOM_PROFILE_VALUE("BroadphasePairs", static_cast<double>(pairCount));
     }
 };
 
@@ -116,10 +116,10 @@ public:
  */
 class PhysicsWorld {
 public:
-    PhysicsWorld(int numObjects)
+    PhysicsWorld(size_t numObjects)
         : objects_(numObjects), broadphase_(), narrowphase_(), solver_() {
         // Initialize objects with random positions and velocities
-        for (int i = 0; i < numObjects; ++i) {
+        for (size_t i = 0; i < numObjects; ++i) {
             objects_[i].x = static_cast<float>(i * 10);
             objects_[i].y = 0.0f;
             objects_[i].z = 0.0f;
@@ -188,7 +188,7 @@ int main() {
 #endif
 
     // Create physics world with 50 objects
-    constexpr int numObjects = 50;
+    constexpr size_t numObjects = 50;
     PhysicsWorld world(numObjects);
 
     std::cout << "Running physics simulation with " << world.getObjectCount()
@@ -219,7 +219,8 @@ int main() {
             .count();
 
     std::cout << "\nSimulation completed in " << duration << " ms\n";
-    std::cout << "Average frame time: " << (duration / static_cast<float>(numFrames))
+    std::cout << "Average frame time: "
+              << (static_cast<double>(duration) / static_cast<double>(numFrames))
               << " ms\n";
 
 #ifdef AXIOM_ENABLE_PROFILING
