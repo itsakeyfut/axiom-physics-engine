@@ -15,4 +15,6 @@ set_target_properties(profiling_example PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
+# Job system examples will be added here in the future
+
 message(STATUS "Examples configured: profiling_example")

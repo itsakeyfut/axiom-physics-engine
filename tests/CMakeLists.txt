@@ -6,6 +6,7 @@ add_executable(axiom_tests
     core/result_test.cpp
     core/assert_test.cpp
     core/test_profiler.cpp
+    core/threading/job_system_test.cpp
     math/test_vec.cpp
     math/test_vec_ops.cpp
     math/mat4_test.cpp

@@ -6,6 +6,7 @@ set(AXIOM_CORE_SOURCES
     version.cpp
     error_code.cpp
     assert.cpp
+    threading/job_system.cpp
 )
 
 # Header files (for IDE organization)
@@ -15,6 +16,8 @@ set(AXIOM_CORE_HEADERS
     ${CMAKE_SOURCE_DIR}/include/axiom/core/result.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/core/assert.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/core/profiler.hpp
+    ${CMAKE_SOURCE_DIR}/include/axiom/core/threading/work_stealing_queue.hpp
+    ${CMAKE_SOURCE_DIR}/include/axiom/core/threading/job_system.hpp
 )
 
 # Create library target
