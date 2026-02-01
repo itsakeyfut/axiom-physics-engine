@@ -1,5 +1,6 @@
 #pragma once
 
+#include "axiom/core/assert.hpp"
 #include "axiom/core/error_code.hpp"
 
 #include <type_traits>
@@ -120,7 +121,7 @@ public:
     /// @return Reference to the success value
     /// @pre isSuccess() must be true
     T& value() & {
-        // In debug builds, we could add an assertion here
+        AXIOM_ASSERT(success_, "Attempted to get value from failed Result");
         return value_;
     }
 
@@ -128,7 +129,7 @@ public:
     /// @return Const reference to the success value
     /// @pre isSuccess() must be true
     const T& value() const& {
-        // In debug builds, we could add an assertion here
+        AXIOM_ASSERT(success_, "Attempted to get value from failed Result");
         return value_;
     }
 
@@ -136,7 +137,7 @@ public:
     /// @return Moved success value
     /// @pre isSuccess() must be true
     T&& value() && {
-        // In debug builds, we could add an assertion here
+        AXIOM_ASSERT(success_, "Attempted to get value from failed Result");
         return std::move(value_);
     }
 
