@@ -136,7 +136,6 @@ JobHandle JobSystem::createParallelFor(uint32_t count, ParallelForFunc func,
     }
 
     Job* parentJob = getJobPtr(parent);
-    parentJob->func = nullptr; // Parent just waits for children
     parentJob->debugName = debugName;
     parentJob->unfinishedChildren.store(numBatches, std::memory_order_relaxed);
     parentJob->state.store(JobState::Created, std::memory_order_release);
@@ -476,7 +475,7 @@ void JobSystem::cleanupFinishedJobs() {
         JobState expected = JobState::Finished;
         if (job.state.compare_exchange_strong(expected, JobState::Free,
                                                std::memory_order_acq_rel)) {
-            job.func = nullptr; // Release captured resources
+            job.func = {}; // Release captured resources
         }
     }
 
