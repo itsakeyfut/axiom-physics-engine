@@ -101,6 +101,10 @@ JobHandle JobSystem::createJob(JobFunc func, const char* debugName) {
     }
 
     Job* job = getJobPtr(handle);
+    if (!job) {
+        return JobHandle{};
+    }
+
     job->func = std::move(func);
     job->debugName = debugName;
     job->state.store(JobState::Created, std::memory_order_release);
@@ -136,6 +140,10 @@ JobHandle JobSystem::createParallelFor(uint32_t count, ParallelForFunc func,
     }
 
     Job* parentJob = getJobPtr(parent);
+    if (!parentJob) {
+        return JobHandle{};
+    }
+
     parentJob->debugName = debugName;
     parentJob->unfinishedChildren.store(numBatches, std::memory_order_relaxed);
     parentJob->state.store(JobState::Created, std::memory_order_release);
@@ -167,6 +175,10 @@ JobHandle JobSystem::createChildJob(JobHandle parent, JobFunc func, const char* 
     }
 
     Job* job = getJobPtr(handle);
+    if (!job) {
+        return JobHandle{};
+    }
+
     job->func = std::move(func);
     job->debugName = debugName;
     job->parentIndex = parent.index;
