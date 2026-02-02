@@ -188,7 +188,7 @@ jobs:
       - name: Run tests
         working-directory: build/linux-gcc
         run: |
-          ctest --output-on-failure || echo "No tests to run yet"
+          ctest --output-on-failure --parallel || echo "No tests to run yet"
 
       - name: Generate coverage report
         continue-on-error: true
