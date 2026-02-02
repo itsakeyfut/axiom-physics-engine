@@ -444,8 +444,14 @@ void JobSystem::finishJob(Job* job, uint32_t jobIndex) {
         return;
     }
 
-    job->state.store(JobState::Finished, std::memory_order_release);
-    activeJobs_.fetch_sub(1, std::memory_order_relaxed);
+    // Atomically transition to Finished and get previous state
+    JobState prevState = job->state.exchange(JobState::Finished, std::memory_order_acq_rel);
+
+    // Only decrement activeJobs if the job was actually scheduled
+    // (Parent jobs may finish via notifyJobFinished before being scheduled)
+    if (prevState != JobState::Created) {
+        activeJobs_.fetch_sub(1, std::memory_order_relaxed);
+    }
 
     // Notify parent
     if (job->parentIndex != 0) {
