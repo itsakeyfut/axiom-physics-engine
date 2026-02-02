@@ -202,7 +202,7 @@ void JobSystem::schedule(JobHandle handle) {
     uint32_t threadIdx = threadIndex_;
     if (threadIdx == UINT32_MAX || threadIdx >= workerCount_) {
         static thread_local std::mt19937 rng{std::random_device{}()};
-        threadIdx = rng() % workerCount_;
+        threadIdx = static_cast<uint32_t>(rng() % workerCount_);
     }
 
     queues_[threadIdx]->push(handle.index);
@@ -367,7 +367,7 @@ JobSystem::Job* JobSystem::getJob(uint32_t threadIndex) {
 
     // Steal from others
     static thread_local std::mt19937 rng{std::random_device{}()};
-    uint32_t start = rng() % workerCount_;
+    uint32_t start = static_cast<uint32_t>(rng() % workerCount_);
 
     for (uint32_t i = 0; i < workerCount_; ++i) {
         uint32_t victimIdx = (start + i) % workerCount_;
@@ -427,6 +427,12 @@ JobSystem::Job* JobSystem::getJobPtr(JobHandle handle) const {
 }
 
 void JobSystem::finishJob(Job* job, uint32_t jobIndex) {
+    // If job has unfinished children, don't finish yet
+    // The last child will call finishJob again via notifyJobFinished
+    if (job->unfinishedChildren.load(std::memory_order_acquire) > 0) {
+        return;
+    }
+
     job->state.store(JobState::Finished, std::memory_order_release);
     activeJobs_.fetch_sub(1, std::memory_order_relaxed);
 
