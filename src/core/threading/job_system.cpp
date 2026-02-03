@@ -297,11 +297,21 @@ void JobSystem::wait(JobHandle handle) {
         Job* workJob = getJob(threadIdx);
         if (workJob) {
             executeJob(workJob, threadIdx);
-        } else {
-            // No work available: sleep briefly to allow workers to make progress
-            // This is critical in low-core CI environments where yield() is insufficient
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            continue; // Check job completion immediately after helping
         }
+
+        // No work available: use condition variable with minimal lock time
+        // This approach balances responsiveness with worker thread access
+        {
+            std::unique_lock<std::mutex> lock(wakeMutex_);
+            // Double-check job state while holding lock to avoid missed notifications
+            if (job->state.load(std::memory_order_acquire) == JobState::Finished) {
+                return;
+            }
+            // Wait briefly, then release lock to let workers make progress
+            wakeCondition_.wait_for(lock, std::chrono::milliseconds(1));
+        }
+        // Lock is released here - workers can now acquire it
     }
 }
 
