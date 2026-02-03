@@ -258,7 +258,8 @@ void JobSystem::wait(JobHandle handle) {
         std::this_thread::yield();
     }
 
-    // Phase 2: Help process jobs while waiting (efficient and prevents deadlock)
+    // Phase 2: Help process jobs while waiting
+    // Use simple polling approach to avoid mutex contention with workers
     auto startTime = std::chrono::steady_clock::now();
     constexpr auto deadlockTimeout = std::chrono::seconds(60); // 60 seconds timeout
 
@@ -293,25 +294,15 @@ void JobSystem::wait(JobHandle handle) {
         }
 
         // Help execute jobs while waiting (all threads, including main thread)
-        // This prevents deadlock when all worker threads are blocked waiting
+        // This prevents deadlock when all worker threads are blocked
         Job* workJob = getJob(threadIdx);
         if (workJob) {
             executeJob(workJob, threadIdx);
-            continue; // Check job completion immediately after helping
+        } else {
+            // No work available: sleep briefly to give workers CPU time
+            // Polling approach avoids mutex contention with workerMain()
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
         }
-
-        // No work available: use condition variable with minimal lock time
-        // This approach balances responsiveness with worker thread access
-        {
-            std::unique_lock<std::mutex> lock(wakeMutex_);
-            // Double-check job state while holding lock to avoid missed notifications
-            if (job->state.load(std::memory_order_acquire) == JobState::Finished) {
-                return;
-            }
-            // Wait briefly, then release lock to let workers make progress
-            wakeCondition_.wait_for(lock, std::chrono::milliseconds(1));
-        }
-        // Lock is released here - workers can now acquire it
     }
 }
 
