@@ -348,6 +348,11 @@ void JobSystem::workerMain(uint32_t threadIndex) {
             // No work: yield briefly then wait
             std::this_thread::yield();
 
+            // Check running_ again before acquiring lock to ensure shutdown responsiveness
+            if (!running_.load(std::memory_order_acquire)) {
+                break;
+            }
+
             std::unique_lock<std::mutex> lock(wakeMutex_);
             if (activeJobs_.load(std::memory_order_relaxed) == 0) {
                 wakeCondition_.wait_for(lock, std::chrono::milliseconds(10));
