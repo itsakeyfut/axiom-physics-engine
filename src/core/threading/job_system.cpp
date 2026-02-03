@@ -298,8 +298,9 @@ void JobSystem::wait(JobHandle handle) {
         if (workJob) {
             executeJob(workJob, threadIdx);
         } else {
-            // No work available: yield briefly to allow workers to make progress
-            std::this_thread::yield();
+            // No work available: sleep briefly to allow workers to make progress
+            // This is critical in low-core CI environments where yield() is insufficient
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
         }
     }
 }
