@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <cstdio>
 #include <random>
 
 namespace axiom::core::threading {
@@ -240,7 +241,6 @@ void JobSystem::wait(JobHandle handle) {
     }
 
     uint32_t threadIdx = threadIndex_;
-    bool isWorker = (threadIdx != UINT32_MAX && threadIdx < workerCount_);
 
     // Phase 1: Spin briefly (low latency for short jobs)
     constexpr int spinIterations = 100;
@@ -249,31 +249,58 @@ void JobSystem::wait(JobHandle handle) {
             return;
         }
 
-        // Help execute jobs while spinning
-        if (isWorker) {
-            Job* workJob = getJob(threadIdx);
-            if (workJob) {
-                executeJob(workJob, threadIdx);
-            }
+        // Help execute jobs while spinning (all threads, including main thread)
+        Job* workJob = getJob(threadIdx);
+        if (workJob) {
+            executeJob(workJob, threadIdx);
         }
 
         std::this_thread::yield();
     }
 
-    // Phase 2: Block with condition variable (efficient for long jobs)
-    std::unique_lock<std::mutex> lock(wakeMutex_);
-    while (job->state.load(std::memory_order_acquire) != JobState::Finished) {
-        wakeCondition_.wait_for(lock, std::chrono::milliseconds(1));
+    // Phase 2: Help process jobs while waiting (efficient and prevents deadlock)
+    auto startTime = std::chrono::steady_clock::now();
+    constexpr auto deadlockTimeout = std::chrono::seconds(60); // 60 seconds timeout
 
-        // Help execute jobs while waiting
-        lock.unlock();
-        if (isWorker) {
-            Job* workJob = getJob(threadIdx);
-            if (workJob) {
-                executeJob(workJob, threadIdx);
+    while (job->state.load(std::memory_order_acquire) != JobState::Finished) {
+        // Check for potential deadlock
+        auto elapsed = std::chrono::steady_clock::now() - startTime;
+        if (elapsed > deadlockTimeout) {
+            // Log diagnostic information
+            JobState state = job->state.load(std::memory_order_acquire);
+            uint32_t unfinished = job->unfinishedChildren.load(std::memory_order_acquire);
+            uint32_t active = activeJobs_.load(std::memory_order_relaxed);
+
+            char buffer[512];
+            snprintf(buffer, sizeof(buffer),
+                "\n[DEADLOCK] JobSystem::wait() timeout - possible deadlock detected\n"
+                "  Job state: %d (0=Free, 1=Created, 2=Scheduled, 3=Running, 4=Finished)\n"
+                "  Unfinished children: %u\n"
+                "  Active jobs: %u\n"
+                "  Debug name: %s\n",
+                static_cast<int>(state), unfinished, active,
+                job->debugName ? job->debugName : "unknown");
+
+            fprintf(stderr, "%s", buffer);
+
+            if (errorCallback_) {
+                errorCallback_(buffer);
             }
+
+            // In production, we'd return here, but for testing, we assert to catch the bug
+            assert(false && "JobSystem deadlock detected");
+            return;
         }
-        lock.lock();
+
+        // Help execute jobs while waiting (all threads, including main thread)
+        // This prevents deadlock when all worker threads are blocked waiting
+        Job* workJob = getJob(threadIdx);
+        if (workJob) {
+            executeJob(workJob, threadIdx);
+        } else {
+            // No work available: yield briefly to allow workers to make progress
+            std::this_thread::yield();
+        }
     }
 }
 
@@ -372,6 +399,10 @@ JobSystem::Job* JobSystem::getJob(uint32_t threadIndex) {
             uint32_t idx = jobIndex.value();
             if (idx > 0 && idx < MAX_JOBS) {
                 return &jobPool_[idx];
+            } else {
+                // Invalid job index detected - this indicates a serious bug
+                fprintf(stderr, "[ERROR] getJob: Invalid job index from own queue: %u (thread %u)\n",
+                    idx, threadIndex);
             }
         }
     }
@@ -391,6 +422,10 @@ JobSystem::Job* JobSystem::getJob(uint32_t threadIndex) {
             uint32_t idx = jobIndex.value();
             if (idx > 0 && idx < MAX_JOBS) {
                 return &jobPool_[idx];
+            } else {
+                // Invalid job index detected from stealing
+                fprintf(stderr, "[ERROR] getJob: Invalid job index stolen from queue %u: %u (thread %u)\n",
+                    victimIdx, idx, threadIndex);
             }
         }
     }

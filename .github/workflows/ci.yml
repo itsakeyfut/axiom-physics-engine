@@ -143,7 +143,7 @@ jobs:
       - name: Run tests
         working-directory: build/${{ steps.preset.outputs.preset }}
         run: |
-          ctest --build-config ${{ matrix.build_type }} --output-on-failure --parallel
+          ctest --build-config ${{ matrix.build_type }} --output-on-failure --timeout 300
 
   code-coverage:
     name: Code Coverage
@@ -188,7 +188,7 @@ jobs:
       - name: Run tests
         working-directory: build/linux-gcc
         run: |
-          ctest --output-on-failure --parallel || echo "No tests to run yet"
+          ctest --output-on-failure --timeout 300 || echo "No tests to run yet"
 
       - name: Generate coverage report
         continue-on-error: true
