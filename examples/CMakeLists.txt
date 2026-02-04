@@ -30,4 +30,19 @@ set_target_properties(vk_test PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
-message(STATUS "Examples configured: profiling_example, vk_test")
+# Command buffer example - demonstrates command buffer management
+add_executable(command_buffer_example
+    command_buffer_example.cpp
+)
+
+target_link_libraries(command_buffer_example
+    PRIVATE
+        axiom::gpu
+        axiom::core
+)
+
+set_target_properties(command_buffer_example PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
+message(STATUS "Examples configured: profiling_example, vk_test, command_buffer_example")
