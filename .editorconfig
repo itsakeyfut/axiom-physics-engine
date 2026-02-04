@@ -62,8 +62,8 @@ indent_style = space
 indent_size = 4
 max_line_length = 120
 
-# GLSL shader files
-[*.{vert,frag,geom,comp,glsl}]
+# Slang/HLSL shader files (also supports GLSL)
+[*.{vert,frag,geom,comp,glsl,slang,hlsl}]
 indent_style = space
 indent_size = 4
 
