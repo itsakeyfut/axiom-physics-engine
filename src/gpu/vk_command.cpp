@@ -1,6 +1,7 @@
 #include "axiom/gpu/vk_command.hpp"
 
 #include "axiom/core/assert.hpp"
+#include "axiom/core/logger.hpp"
 #include "axiom/gpu/vk_instance.hpp"
 
 #include <cstring>
@@ -41,9 +42,8 @@ CommandPool::CommandPool(VkContext* context, uint32_t queueFamily, VkCommandPool
 
     VkResult result = vkCreateCommandPool(context_->getDevice(), &poolInfo, nullptr, &pool_);
 
-    // TODO: Replace with proper error handling when logger is integrated
     if (result != VK_SUCCESS) {
-        fprintf(stderr, "[Vulkan Error] Failed to create command pool\n");
+        AXIOM_LOG_ERROR("GPU", "Failed to create command pool: VkResult=%d", result);
         pool_ = VK_NULL_HANDLE;
     }
 }
@@ -69,7 +69,7 @@ VkCommandBuffer CommandPool::allocate(VkCommandBufferLevel level) {
     VkResult result = vkAllocateCommandBuffers(context_->getDevice(), &allocInfo, &commandBuffer);
 
     if (result != VK_SUCCESS) {
-        fprintf(stderr, "[Vulkan Error] Failed to allocate command buffer\n");
+        AXIOM_LOG_ERROR("GPU", "Failed to allocate command buffer: VkResult=%d", result);
         return VK_NULL_HANDLE;
     }
 
@@ -93,7 +93,7 @@ std::vector<VkCommandBuffer> CommandPool::allocateMultiple(uint32_t count,
                                                commandBuffers.data());
 
     if (result != VK_SUCCESS) {
-        fprintf(stderr, "[Vulkan Error] Failed to allocate command buffers\n");
+        AXIOM_LOG_ERROR("GPU", "Failed to allocate command buffers: VkResult=%d", result);
         return {};
     }
 
@@ -260,7 +260,7 @@ OneTimeCommand::OneTimeCommand(VkContext* context, VkQueue queue, uint32_t queue
 
     VkResult result = vkCreateCommandPool(context_->getDevice(), &poolInfo, nullptr, &pool_);
     if (result != VK_SUCCESS) {
-        fprintf(stderr, "[Vulkan Error] Failed to create transient command pool\n");
+        AXIOM_LOG_ERROR("GPU", "Failed to create transient command pool: VkResult=%d", result);
         return;
     }
 
@@ -273,7 +273,7 @@ OneTimeCommand::OneTimeCommand(VkContext* context, VkQueue queue, uint32_t queue
 
     result = vkAllocateCommandBuffers(context_->getDevice(), &allocInfo, &buffer_);
     if (result != VK_SUCCESS) {
-        fprintf(stderr, "[Vulkan Error] Failed to allocate one-time command buffer\n");
+        AXIOM_LOG_ERROR("GPU", "Failed to allocate one-time command buffer: VkResult=%d", result);
         vkDestroyCommandPool(context_->getDevice(), pool_, nullptr);
         pool_ = VK_NULL_HANDLE;
         return;
@@ -286,7 +286,7 @@ OneTimeCommand::OneTimeCommand(VkContext* context, VkQueue queue, uint32_t queue
 
     result = vkBeginCommandBuffer(buffer_, &beginInfo);
     if (result != VK_SUCCESS) {
-        fprintf(stderr, "[Vulkan Error] Failed to begin one-time command buffer\n");
+        AXIOM_LOG_ERROR("GPU", "Failed to begin one-time command buffer: VkResult=%d", result);
         vkDestroyCommandPool(context_->getDevice(), pool_, nullptr);
         pool_ = VK_NULL_HANDLE;
         buffer_ = VK_NULL_HANDLE;
@@ -298,7 +298,7 @@ OneTimeCommand::~OneTimeCommand() {
         // End recording
         VkResult result = vkEndCommandBuffer(buffer_);
         if (result != VK_SUCCESS) {
-            fprintf(stderr, "[Vulkan Error] Failed to end one-time command buffer\n");
+            AXIOM_LOG_ERROR("GPU", "Failed to end one-time command buffer: VkResult=%d", result);
         } else {
             // Submit and wait
             VkSubmitInfo submitInfo{};
@@ -308,12 +308,13 @@ OneTimeCommand::~OneTimeCommand() {
 
             result = vkQueueSubmit(queue_, 1, &submitInfo, VK_NULL_HANDLE);
             if (result != VK_SUCCESS) {
-                fprintf(stderr, "[Vulkan Error] Failed to submit one-time command buffer\n");
+                AXIOM_LOG_ERROR("GPU", "Failed to submit one-time command buffer: VkResult=%d",
+                                result);
             } else {
                 // Wait for queue to finish
                 result = vkQueueWaitIdle(queue_);
                 if (result != VK_SUCCESS) {
-                    fprintf(stderr, "[Vulkan Error] Failed to wait for queue idle\n");
+                    AXIOM_LOG_ERROR("GPU", "Failed to wait for queue idle: VkResult=%d", result);
                 }
             }
         }

@@ -1,6 +1,7 @@
 #include "axiom/gpu/vk_instance.hpp"
 
 #include "axiom/core/assert.hpp"
+#include "axiom/core/logger.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -34,21 +35,16 @@ debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 #endif
     }
 
-    // Log validation layer messages
-    // In a real implementation, this would use the spdlog logger
-    const char* severityStr = "UNKNOWN";
+    // Log validation layer messages using the logger
     if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-        severityStr = "ERROR";
+        AXIOM_LOG_ERROR("Vulkan", "%s", pCallbackData->pMessage);
     } else if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-        severityStr = "WARNING";
+        AXIOM_LOG_WARN("Vulkan", "%s", pCallbackData->pMessage);
     } else if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
-        severityStr = "INFO";
+        AXIOM_LOG_INFO("Vulkan", "%s", pCallbackData->pMessage);
     } else {
-        severityStr = "VERBOSE";
+        AXIOM_LOG_TRACE("Vulkan", "%s", pCallbackData->pMessage);
     }
-
-    // TODO: Replace with spdlog when logger is integrated
-    fprintf(stderr, "[Vulkan %s] %s\n", severityStr, pCallbackData->pMessage);
 
     return VK_FALSE;
 }
@@ -244,8 +240,7 @@ core::Result<void> VkContext::selectPhysicalDevice() {
     // Log selected device info
     VkPhysicalDeviceProperties properties;
     vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
-    // TODO: Use spdlog when integrated
-    fprintf(stdout, "[Vulkan] Selected GPU: %s\n", properties.deviceName);
+    AXIOM_LOG_INFO("GPU", "Selected GPU: %s", properties.deviceName);
 
     return core::Result<void>::success();
 }
