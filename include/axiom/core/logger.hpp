@@ -154,14 +154,24 @@ private:
 // Logging Macros
 //=============================================================================
 
+// Suppress warnings about GNU ##__VA_ARGS__ extension (supported by all major compilers)
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#endif
+
+// Helper macro to handle optional variadic arguments portably
+// MSVC, GCC, and Clang all support ##__VA_ARGS__ extension
+#define AXIOM_LOG_IMPL(level, category, format, ...)                                              \
+    ::axiom::core::Logger::getInstance().log(level, category, format, ##__VA_ARGS__)
+
 /// Log a trace message
 /// @param category The category/module name (e.g., "GPU", "Physics")
 /// @param format Format string (printf-style)
 /// @param ... Format arguments
 #define AXIOM_LOG_TRACE(category, format, ...)                                                    \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Trace, category,        \
-                                                 format, ##__VA_ARGS__);                           \
+        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Trace, category, format, __VA_ARGS__);            \
     } while (false)
 
 /// Log a debug message
@@ -170,8 +180,7 @@ private:
 /// @param ... Format arguments
 #define AXIOM_LOG_DEBUG(category, format, ...)                                                    \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Debug, category,        \
-                                                 format, ##__VA_ARGS__);                           \
+        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Debug, category, format, __VA_ARGS__);            \
     } while (false)
 
 /// Log an info message
@@ -180,8 +189,7 @@ private:
 /// @param ... Format arguments
 #define AXIOM_LOG_INFO(category, format, ...)                                                     \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Info, category, format, \
-                                                 ##__VA_ARGS__);                                   \
+        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Info, category, format, __VA_ARGS__);             \
     } while (false)
 
 /// Log a warning message
@@ -190,8 +198,7 @@ private:
 /// @param ... Format arguments
 #define AXIOM_LOG_WARN(category, format, ...)                                                     \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Warning, category,      \
-                                                 format, ##__VA_ARGS__);                           \
+        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Warning, category, format, __VA_ARGS__);          \
     } while (false)
 
 /// Log an error message
@@ -200,8 +207,7 @@ private:
 /// @param ... Format arguments
 #define AXIOM_LOG_ERROR(category, format, ...)                                                    \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Error, category,        \
-                                                 format, ##__VA_ARGS__);                           \
+        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Error, category, format, __VA_ARGS__);            \
     } while (false)
 
 /// Log a fatal message
@@ -210,6 +216,9 @@ private:
 /// @param ... Format arguments
 #define AXIOM_LOG_FATAL(category, format, ...)                                                    \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Fatal, category,        \
-                                                 format, ##__VA_ARGS__);                           \
+        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Fatal, category, format, __VA_ARGS__);            \
     } while (false)
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

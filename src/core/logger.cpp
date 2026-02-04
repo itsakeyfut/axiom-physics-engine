@@ -11,6 +11,8 @@
 
 #ifdef AXIOM_PLATFORM_WINDOWS
 #include <windows.h>
+#else
+#include <unistd.h>  // For isatty
 #endif
 
 namespace axiom::core {
@@ -228,8 +230,10 @@ void FileLogSink::write(LogLevel level, const char* category, const char* messag
     FILE* file = static_cast<FILE*>(fileHandle_);
     std::string formatted = formatLogMessage(level, category, message);
 
-    size_t written = fprintf(file, "%s\n", formatted.c_str());
-    currentSize_ += written;
+    int result = fprintf(file, "%s\n", formatted.c_str());
+    if (result > 0) {
+        currentSize_ += static_cast<size_t>(result);
+    }
 
     // Check if rotation is needed
     if (maxFileSize_ > 0 && currentSize_ >= maxFileSize_) {
@@ -329,6 +333,16 @@ void Logger::log(LogLevel level, const char* category, const char* format, ...) 
     // Determine required buffer size
     va_list args_copy;
     va_copy(args_copy, args);
+
+    // Suppress format-nonliteral warning for vsnprintf with dynamic format strings
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
+
     int size = vsnprintf(nullptr, 0, format, args_copy);
     va_end(args_copy);
 
@@ -340,6 +354,11 @@ void Logger::log(LogLevel level, const char* category, const char* format, ...) 
     // Allocate buffer and format message
     std::vector<char> buffer(static_cast<size_t>(size) + 1);
     vsnprintf(buffer.data(), buffer.size(), format, args);
+
+#if defined(__clang__) || defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
     va_end(args);
 
     // Write to all sinks
