@@ -63,9 +63,9 @@ public:
 
     /// Buffer creation parameters
     struct BufferCreateInfo {
-        VkDeviceSize size;            ///< Size in bytes
-        VkBufferUsageFlags usage;     ///< Buffer usage flags (e.g., STORAGE_BUFFER, TRANSFER_SRC)
-        MemoryUsage memoryUsage;      ///< Memory usage pattern
+        VkDeviceSize size;         ///< Size in bytes
+        VkBufferUsageFlags usage;  ///< Buffer usage flags (e.g., STORAGE_BUFFER, TRANSFER_SRC)
+        MemoryUsage memoryUsage;   ///< Memory usage pattern
         bool persistentMapping = false;  ///< Keep memory mapped after creation
     };
 
@@ -77,12 +77,12 @@ public:
 
     /// Image creation parameters
     struct ImageCreateInfo {
-        VkExtent3D extent;                   ///< Image dimensions (width, height, depth)
-        VkFormat format;                     ///< Pixel format
-        VkImageUsageFlags usage;             ///< Image usage flags
+        VkExtent3D extent;        ///< Image dimensions (width, height, depth)
+        VkFormat format;          ///< Pixel format
+        VkImageUsageFlags usage;  ///< Image usage flags
         VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL;  ///< Tiling mode
-        uint32_t mipLevels = 1;              ///< Number of mipmap levels
-        uint32_t arrayLayers = 1;            ///< Number of array layers
+        uint32_t mipLevels = 1;                          ///< Number of mipmap levels
+        uint32_t arrayLayers = 1;                        ///< Number of array layers
         MemoryUsage memoryUsage = MemoryUsage::GpuOnly;  ///< Memory usage pattern
     };
 

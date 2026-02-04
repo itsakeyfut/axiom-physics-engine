@@ -6,8 +6,8 @@
 
 // Platform-specific headers for stack trace
 #ifdef AXIOM_PLATFORM_WINDOWS
-#include <windows.h>  // Must be included before dbghelp.h
 #include <dbghelp.h>
+#include <windows.h>  // Must be included before dbghelp.h
 #pragma comment(lib, "dbghelp.lib")
 #elif defined(AXIOM_PLATFORM_LINUX) || defined(AXIOM_PLATFORM_MACOS)
 #include <cxxabi.h>

@@ -123,7 +123,7 @@ public:
         std::vector<VkSemaphore> waitSemaphores;       ///< Semaphores to wait on
         std::vector<VkPipelineStageFlags> waitStages;  ///< Pipeline stages to wait at
         std::vector<VkSemaphore> signalSemaphores;     ///< Semaphores to signal
-        VkFence fence;                                 ///< Optional fence to signal (defaults to VK_NULL_HANDLE)
+        VkFence fence;  ///< Optional fence to signal (defaults to VK_NULL_HANDLE)
     };
 
     /// Submit command buffer to a queue
