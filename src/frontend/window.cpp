@@ -211,7 +211,16 @@ void Window::toggleFullscreen() {
 
         // Switch to fullscreen mode
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        if (monitor == nullptr) {
+            AXIOM_LOG_ERROR("Window", "No monitor available for fullscreen switch");
+            return;
+        }
+
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        if (mode == nullptr) {
+            AXIOM_LOG_ERROR("Window", "Failed to query monitor video mode");
+            return;
+        }
 
         glfwSetWindowMonitor(window_, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
         isFullscreen_ = true;
