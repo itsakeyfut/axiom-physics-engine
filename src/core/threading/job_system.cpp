@@ -299,9 +299,9 @@ void JobSystem::wait(JobHandle handle) {
         if (workJob) {
             executeJob(workJob, threadIdx);
         } else {
-            // No work available: sleep briefly to give workers CPU time
-            // Polling approach avoids mutex contention with workerMain()
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            // No work available: yield CPU to give workers a chance to execute
+            // Longer sleep in CI environments helps prevent starvation
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 }
@@ -336,17 +336,17 @@ void JobSystem::workerMain(uint32_t threadIndex) {
         if (job) {
             executeJob(job, threadIndex);
         } else {
-            // No work: yield briefly then wait
-            std::this_thread::yield();
+            // No work available: wait briefly to avoid busy-waiting
+            // This is critical for CI environments with limited cores
+            std::unique_lock<std::mutex> lock(wakeMutex_);
 
-            // Check running_ again before acquiring lock to ensure shutdown responsiveness
+            // Always wait with a short timeout, regardless of activeJobs count
+            // This prevents starvation when jobs are queued but not yet stealable
+            wakeCondition_.wait_for(lock, std::chrono::milliseconds(1));
+
+            // Check running_ after wake to ensure shutdown responsiveness
             if (!running_.load(std::memory_order_acquire)) {
                 break;
-            }
-
-            std::unique_lock<std::mutex> lock(wakeMutex_);
-            if (activeJobs_.load(std::memory_order_relaxed) == 0) {
-                wakeCondition_.wait_for(lock, std::chrono::milliseconds(10));
             }
         }
     }
