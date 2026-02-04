@@ -199,6 +199,65 @@ ctest --preset macos-debug
 ./build/windows-release/bin/axiom_benchmark
 ```
 
+## Running the Application
+
+### Running the Demo Application
+
+After building the project, you can run the Axiom Physics Engine demo application:
+
+#### Windows
+
+```bash
+# Run debug build
+./build/windows-debug/bin/Debug/axiom_app.exe
+
+# Run release build
+./build/windows-release/bin/Release/axiom_app.exe
+
+# Using Makefile
+make run         # Run debug build
+make run-release # Run release build
+make app         # Alias for 'make run'
+```
+
+#### Linux
+
+```bash
+# Run debug build
+./build/linux-debug/bin/axiom_app
+
+# Run release build
+./build/linux-release/bin/axiom_app
+
+# Using Makefile
+make run         # Run debug build
+make run-release # Run release build
+make app         # Alias for 'make run'
+```
+
+#### macOS
+
+```bash
+# Run debug build
+./build/macos-debug/bin/axiom_app
+
+# Run release build
+./build/macos-release/bin/axiom_app
+
+# Using Makefile
+make run         # Run debug build
+make run-release # Run release build
+make app         # Alias for 'make run'
+```
+
+The demo application demonstrates:
+- GLFW window creation with Vulkan surface
+- Basic rendering setup
+- Event handling (keyboard, mouse)
+- Integration between the frontend and GPU modules
+
+Press `ESC` to close the application window.
+
 ## Troubleshooting
 
 ### vcpkg Issues

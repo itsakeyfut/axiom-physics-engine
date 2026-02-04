@@ -1,31 +1,58 @@
+#include "axiom/frontend/window.hpp"
 #include "axiom/gpu/vk_instance.hpp"
 #include "axiom/gpu/vk_swapchain.hpp"
+#include "axiom/gpu/vk_sync.hpp"
 
 #include <gtest/gtest.h>
 
+using namespace axiom::frontend;
 using namespace axiom::gpu;
 using namespace axiom::core;
 
 // Test fixture for Swapchain tests
-// Note: These tests require a valid VkSurfaceKHR which requires a window system.
-// Since the project doesn't have windowing infrastructure yet, most tests are
-// disabled and serve as documentation of the API contract.
+// These tests use real GLFW windows and Vulkan surfaces
 class SwapchainTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        // Create context for swapchain tests
-        auto result = VkContext::create();
-        if (result.isSuccess()) {
-            context_ = std::move(result.value());
+        // Initialize GLFW first (required for surface extension support)
+        auto glfwResult = Window::initializeGLFW();
+        if (glfwResult.isFailure()) {
+            GTEST_SKIP() << "GLFW initialization failed: " << glfwResult.errorMessage()
+                         << " (this is expected in headless CI environments)";
+        }
+
+        // Create context for swapchain tests (will include GLFW surface extensions)
+        auto contextResult = VkContext::create();
+        if (contextResult.isSuccess()) {
+            context_ = std::move(contextResult.value());
         } else {
-            GTEST_SKIP() << "Vulkan not available: " << result.errorMessage()
+            GTEST_SKIP() << "Vulkan not available: " << contextResult.errorMessage()
                          << " (this is expected in CI environments without GPU)";
+        }
+
+        // Create window for surface
+        WindowConfig windowConfig{.title = "Swapchain Test Window",
+                                  .width = 800,
+                                  .height = 600,
+                                  .fullscreen = false,
+                                  .visible = false};
+
+        auto windowResult = Window::create(context_.get(), windowConfig);
+        if (windowResult.isSuccess()) {
+            window_ = std::move(windowResult.value());
+        } else {
+            GTEST_SKIP() << "Window creation failed: " << windowResult.errorMessage()
+                         << " (this is expected in headless CI environments)";
         }
     }
 
-    void TearDown() override { context_.reset(); }
+    void TearDown() override {
+        window_.reset();
+        context_.reset();
+    }
 
     std::unique_ptr<VkContext> context_;
+    std::unique_ptr<Window> window_;
 };
 
 // Test swapchain configuration structure
@@ -148,19 +175,14 @@ TEST(SwapchainMoveTest, NotCopyAssignable) {
     EXPECT_FALSE(std::is_copy_assignable_v<Swapchain>);
 }
 
-// The following tests are disabled because they require a real window surface
-// They serve as documentation of expected behavior and can be enabled when
-// windowing infrastructure is added to the test suite.
-
-// DISABLED: Test swapchain creation with valid surface
-TEST_F(SwapchainTest, DISABLED_CreationWithValidSurface) {
+// Test swapchain creation with valid surface
+TEST_F(SwapchainTest, CreationWithValidSurface) {
     ASSERT_NE(context_, nullptr);
+    ASSERT_NE(window_, nullptr);
 
-    // TODO: Create a real VkSurfaceKHR using GLFW or similar
-    // For now, this test is disabled as it requires windowing infrastructure
-    VkSurfaceKHR mockSurface = VK_NULL_HANDLE;  // Would be real surface
+    VkSurfaceKHR surface = window_->getSurface();
 
-    SwapchainConfig config{.surface = mockSurface, .width = 1920, .height = 1080, .vsync = true};
+    SwapchainConfig config{.surface = surface, .width = 800, .height = 600, .vsync = true};
 
     auto result = Swapchain::create(context_.get(), config);
 
@@ -176,147 +198,201 @@ TEST_F(SwapchainTest, DISABLED_CreationWithValidSurface) {
     }
 }
 
-// DISABLED: Test image acquisition
-TEST_F(SwapchainTest, DISABLED_AcquireNextImage) {
+// Test image acquisition
+TEST_F(SwapchainTest, AcquireNextImage) {
     ASSERT_NE(context_, nullptr);
+    ASSERT_NE(window_, nullptr);
 
-    // TODO: Create real surface and swapchain
-    VkSurfaceKHR mockSurface = VK_NULL_HANDLE;
-    SwapchainConfig config{.surface = mockSurface, .width = 1920, .height = 1080, .vsync = true};
+    VkSurfaceKHR surface = window_->getSurface();
+    SwapchainConfig config{.surface = surface, .width = 800, .height = 600, .vsync = true};
 
-    auto result = Swapchain::create(context_.get(), config);
-    ASSERT_TRUE(result.isSuccess());
+    auto swapchainResult = Swapchain::create(context_.get(), config);
+    ASSERT_TRUE(swapchainResult.isSuccess());
 
-    Swapchain& swapchain = result.value();
+    Swapchain& swapchain = swapchainResult.value();
 
-    // TODO: Create real semaphore
-    VkSemaphore mockSemaphore = VK_NULL_HANDLE;
+    // Create a semaphore for image acquisition
+    Semaphore semaphore(context_.get());
 
-    auto acquireResult = swapchain.acquireNextImage(mockSemaphore);
+    auto acquireResult = swapchain.acquireNextImage(semaphore.get());
 
     EXPECT_LT(acquireResult.imageIndex, swapchain.getImageCount());
+    EXPECT_FALSE(acquireResult.needsResize);
 }
 
-// DISABLED: Test presentation
-TEST_F(SwapchainTest, DISABLED_Present) {
+// Test presentation
+TEST_F(SwapchainTest, Present) {
     ASSERT_NE(context_, nullptr);
+    ASSERT_NE(window_, nullptr);
 
-    // TODO: Create real surface and swapchain
-    VkSurfaceKHR mockSurface = VK_NULL_HANDLE;
-    SwapchainConfig config{.surface = mockSurface, .width = 1920, .height = 1080, .vsync = true};
+    VkSurfaceKHR surface = window_->getSurface();
+    SwapchainConfig config{.surface = surface, .width = 800, .height = 600, .vsync = true};
 
-    auto result = Swapchain::create(context_.get(), config);
-    ASSERT_TRUE(result.isSuccess());
+    auto swapchainResult = Swapchain::create(context_.get(), config);
+    ASSERT_TRUE(swapchainResult.isSuccess());
 
-    Swapchain& swapchain = result.value();
+    Swapchain& swapchain = swapchainResult.value();
 
-    PresentInfo presentInfo{.imageIndex = 0, .waitSemaphores = {}};
+    // Create semaphores for synchronization
+    Semaphore acquireSemaphore(context_.get());
+    Semaphore renderSemaphore(context_.get());
+
+    // Acquire image
+    auto acquireResult = swapchain.acquireNextImage(acquireSemaphore.get());
+    ASSERT_FALSE(acquireResult.needsResize);
+
+    // Present image
+    PresentInfo presentInfo{.imageIndex = acquireResult.imageIndex,
+                            .waitSemaphores = {renderSemaphore.get()}};
 
     bool presentSuccess = swapchain.present(context_->getGraphicsQueue(), presentInfo);
 
     EXPECT_TRUE(presentSuccess);
 }
 
-// DISABLED: Test swapchain resize
-TEST_F(SwapchainTest, DISABLED_Resize) {
+// Test swapchain resize
+TEST_F(SwapchainTest, Resize) {
     ASSERT_NE(context_, nullptr);
+    ASSERT_NE(window_, nullptr);
 
-    // TODO: Create real surface and swapchain
-    VkSurfaceKHR mockSurface = VK_NULL_HANDLE;
-    SwapchainConfig config{.surface = mockSurface, .width = 1920, .height = 1080, .vsync = true};
+    VkSurfaceKHR surface = window_->getSurface();
+    SwapchainConfig config{.surface = surface, .width = 800, .height = 600, .vsync = true};
 
-    auto result = Swapchain::create(context_.get(), config);
-    ASSERT_TRUE(result.isSuccess());
+    auto swapchainResult = Swapchain::create(context_.get(), config);
+    ASSERT_TRUE(swapchainResult.isSuccess());
 
-    Swapchain& swapchain = result.value();
+    Swapchain& swapchain = swapchainResult.value();
 
     // Resize to new dimensions
-    auto resizeResult = swapchain.resize(2560, 1440);
+    auto resizeResult = swapchain.resize(1024, 768);
 
     EXPECT_TRUE(resizeResult.isSuccess());
-    EXPECT_EQ(swapchain.getExtent().width, 2560u);
-    EXPECT_EQ(swapchain.getExtent().height, 1440u);
+    EXPECT_EQ(swapchain.getExtent().width, 1024u);
+    EXPECT_EQ(swapchain.getExtent().height, 768u);
 }
 
-// DISABLED: Test resize with zero dimensions fails
-TEST_F(SwapchainTest, DISABLED_ResizeFailsWithZeroDimensions) {
+// Test resize with zero dimensions fails
+TEST_F(SwapchainTest, ResizeFailsWithZeroDimensions) {
     ASSERT_NE(context_, nullptr);
+    ASSERT_NE(window_, nullptr);
 
-    // TODO: Create real surface and swapchain
-    VkSurfaceKHR mockSurface = VK_NULL_HANDLE;
-    SwapchainConfig config{.surface = mockSurface, .width = 1920, .height = 1080, .vsync = true};
+    VkSurfaceKHR surface = window_->getSurface();
+    SwapchainConfig config{.surface = surface, .width = 800, .height = 600, .vsync = true};
 
-    auto result = Swapchain::create(context_.get(), config);
-    ASSERT_TRUE(result.isSuccess());
+    auto swapchainResult = Swapchain::create(context_.get(), config);
+    ASSERT_TRUE(swapchainResult.isSuccess());
 
-    Swapchain& swapchain = result.value();
+    Swapchain& swapchain = swapchainResult.value();
 
     // Try to resize with zero width
-    auto resizeResult = swapchain.resize(0, 1440);
+    auto resizeResult = swapchain.resize(0, 768);
 
     EXPECT_FALSE(resizeResult.isSuccess());
     EXPECT_EQ(resizeResult.errorCode(), ErrorCode::InvalidParameter);
 }
 
-// DISABLED: Test VSync enforcement
-TEST_F(SwapchainTest, DISABLED_VSyncEnforcement) {
+// Test VSync enforcement
+TEST_F(SwapchainTest, VSyncEnforcement) {
     ASSERT_NE(context_, nullptr);
+    ASSERT_NE(window_, nullptr);
 
-    // TODO: Create real surface
-    VkSurfaceKHR mockSurface = VK_NULL_HANDLE;
+    VkSurfaceKHR surface = window_->getSurface();
 
     // Create swapchain with vsync enabled
-    SwapchainConfig configVSync{
-        .surface = mockSurface, .width = 1920, .height = 1080, .vsync = true};
+    SwapchainConfig configVSync{.surface = surface, .width = 800, .height = 600, .vsync = true};
 
     auto resultVSync = Swapchain::create(context_.get(), configVSync);
     ASSERT_TRUE(resultVSync.isSuccess());
 
-    // Present mode should be FIFO when vsync is enabled
-    // (This would require exposing present mode in the API for testing)
+    // Swapchain should be created successfully with vsync
+    Swapchain& swapchain = resultVSync.value();
+    EXPECT_NE(swapchain.get(), VK_NULL_HANDLE);
+
+    // Note: Present mode is not exposed in the API, but we can verify the swapchain was created
+    // The actual FIFO present mode enforcement happens internally
 }
 
-// DISABLED: Test out-of-date handling
-TEST_F(SwapchainTest, DISABLED_OutOfDateHandling) {
+// Test out-of-date handling
+// Note: This test cannot reliably trigger an out-of-date condition programmatically
+// In real usage, out-of-date occurs when the window is resized externally
+TEST_F(SwapchainTest, OutOfDateHandling) {
     ASSERT_NE(context_, nullptr);
+    ASSERT_NE(window_, nullptr);
 
-    // TODO: Create real surface and swapchain
-    VkSurfaceKHR mockSurface = VK_NULL_HANDLE;
-    SwapchainConfig config{.surface = mockSurface, .width = 1920, .height = 1080, .vsync = true};
+    VkSurfaceKHR surface = window_->getSurface();
+    SwapchainConfig config{.surface = surface, .width = 800, .height = 600, .vsync = true};
 
-    auto result = Swapchain::create(context_.get(), config);
-    ASSERT_TRUE(result.isSuccess());
+    auto swapchainResult = Swapchain::create(context_.get(), config);
+    ASSERT_TRUE(swapchainResult.isSuccess());
 
-    // Swapchain& swapchain = result.value(); // Unused until real surface testing is available
+    Swapchain& swapchain = swapchainResult.value();
 
-    // TODO: Trigger out-of-date condition (e.g., by resizing window)
-    // and verify that acquireNextImage returns needsResize = true
-    // Will use 'swapchain' once real surface is available
+    // Create semaphore for acquisition
+    Semaphore semaphore(context_.get());
+
+    // Acquire image - should succeed normally without resize needed
+    auto acquireResult = swapchain.acquireNextImage(semaphore.get());
+    EXPECT_FALSE(acquireResult.needsResize);
+
+    // Note: To trigger out-of-date, we would need external window resize events
+    // which are difficult to simulate in unit tests
 }
 
-// DISABLED: Test multiple swapchains
-TEST_F(SwapchainTest, DISABLED_MultipleSwapchains) {
+// Test multiple swapchains
+TEST_F(SwapchainTest, MultipleSwapchains) {
     ASSERT_NE(context_, nullptr);
 
-    // TODO: Create multiple real surfaces and swapchains
-    // Verify that multiple swapchains can coexist
+    // Create two windows
+    WindowConfig config1{.title = "Window 1", .width = 640, .height = 480, .visible = false};
+    WindowConfig config2{.title = "Window 2", .width = 800, .height = 600, .visible = false};
+
+    auto window1Result = Window::create(context_.get(), config1);
+    ASSERT_TRUE(window1Result.isSuccess());
+    Window& window1 = *window1Result.value();
+
+    auto window2Result = Window::create(context_.get(), config2);
+    ASSERT_TRUE(window2Result.isSuccess());
+    Window& window2 = *window2Result.value();
+
+    // Create swapchains for both windows
+    SwapchainConfig swapchainConfig1{
+        .surface = window1.getSurface(), .width = 640, .height = 480, .vsync = true};
+    SwapchainConfig swapchainConfig2{
+        .surface = window2.getSurface(), .width = 800, .height = 600, .vsync = true};
+
+    auto swapchain1Result = Swapchain::create(context_.get(), swapchainConfig1);
+    ASSERT_TRUE(swapchain1Result.isSuccess());
+
+    auto swapchain2Result = Swapchain::create(context_.get(), swapchainConfig2);
+    ASSERT_TRUE(swapchain2Result.isSuccess());
+
+    // Verify both swapchains are valid and distinct
+    Swapchain& swapchain1 = swapchain1Result.value();
+    Swapchain& swapchain2 = swapchain2Result.value();
+
+    EXPECT_NE(swapchain1.get(), VK_NULL_HANDLE);
+    EXPECT_NE(swapchain2.get(), VK_NULL_HANDLE);
+    EXPECT_NE(swapchain1.get(), swapchain2.get());
 }
 
-// DISABLED: Test swapchain image access
-TEST_F(SwapchainTest, DISABLED_ImageAccess) {
+// Test swapchain image access
+TEST_F(SwapchainTest, ImageAccess) {
     ASSERT_NE(context_, nullptr);
+    ASSERT_NE(window_, nullptr);
 
-    // TODO: Create real surface and swapchain
-    VkSurfaceKHR mockSurface = VK_NULL_HANDLE;
-    SwapchainConfig config{.surface = mockSurface, .width = 1920, .height = 1080, .vsync = true};
+    VkSurfaceKHR surface = window_->getSurface();
+    SwapchainConfig config{.surface = surface, .width = 800, .height = 600, .vsync = true};
 
-    auto result = Swapchain::create(context_.get(), config);
-    ASSERT_TRUE(result.isSuccess());
+    auto swapchainResult = Swapchain::create(context_.get(), config);
+    ASSERT_TRUE(swapchainResult.isSuccess());
 
-    Swapchain& swapchain = result.value();
+    Swapchain& swapchain = swapchainResult.value();
 
     // Verify all images and image views are valid
-    for (uint32_t i = 0; i < swapchain.getImageCount(); ++i) {
+    uint32_t imageCount = swapchain.getImageCount();
+    EXPECT_GT(imageCount, 0u);
+
+    for (uint32_t i = 0; i < imageCount; ++i) {
         EXPECT_NE(swapchain.getImage(i), VK_NULL_HANDLE);
         EXPECT_NE(swapchain.getImageView(i), VK_NULL_HANDLE);
     }

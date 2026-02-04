@@ -27,6 +27,10 @@
     },
     {
       "name": "vulkan-memory-allocator"
+    },
+    {
+      "name": "glfw3",
+      "version>=": "3.4"
     }
   ],
   "features": {

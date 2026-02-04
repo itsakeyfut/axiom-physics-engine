@@ -63,8 +63,7 @@ public:
     /// @param filename Path to the log file
     /// @param maxFileSize Maximum file size before rotation (0 = no rotation)
     /// @param maxFiles Maximum number of rotated files to keep
-    explicit FileLogSink(const std::string& filename, size_t maxFileSize = 0,
-                         size_t maxFiles = 3);
+    explicit FileLogSink(const std::string& filename, size_t maxFileSize = 0, size_t maxFiles = 3);
 
     ~FileLogSink() override;
 
@@ -160,53 +159,53 @@ private:
 /// Log a trace message
 /// @param category The category/module name (e.g., "GPU", "Physics")
 /// @param ... Format string (printf-style) followed by optional arguments
-#define AXIOM_LOG_TRACE(category, ...)                                                            \
+#define AXIOM_LOG_TRACE(category, ...)                                                             \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Trace, category,        \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Trace, category,         \
                                                  __VA_ARGS__);                                     \
     } while (false)
 
 /// Log a debug message
 /// @param category The category/module name (e.g., "GPU", "Physics")
 /// @param ... Format string (printf-style) followed by optional arguments
-#define AXIOM_LOG_DEBUG(category, ...)                                                            \
+#define AXIOM_LOG_DEBUG(category, ...)                                                             \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Debug, category,        \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Debug, category,         \
                                                  __VA_ARGS__);                                     \
     } while (false)
 
 /// Log an info message
 /// @param category The category/module name (e.g., "GPU", "Physics")
 /// @param ... Format string (printf-style) followed by optional arguments
-#define AXIOM_LOG_INFO(category, ...)                                                             \
+#define AXIOM_LOG_INFO(category, ...)                                                              \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Info, category,         \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Info, category,          \
                                                  __VA_ARGS__);                                     \
     } while (false)
 
 /// Log a warning message
 /// @param category The category/module name (e.g., "GPU", "Physics")
 /// @param ... Format string (printf-style) followed by optional arguments
-#define AXIOM_LOG_WARN(category, ...)                                                             \
+#define AXIOM_LOG_WARN(category, ...)                                                              \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Warning, category,      \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Warning, category,       \
                                                  __VA_ARGS__);                                     \
     } while (false)
 
 /// Log an error message
 /// @param category The category/module name (e.g., "GPU", "Physics")
 /// @param ... Format string (printf-style) followed by optional arguments
-#define AXIOM_LOG_ERROR(category, ...)                                                            \
+#define AXIOM_LOG_ERROR(category, ...)                                                             \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Error, category,        \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Error, category,         \
                                                  __VA_ARGS__);                                     \
     } while (false)
 
 /// Log a fatal message
 /// @param category The category/module name (e.g., "GPU", "Physics")
 /// @param ... Format string (printf-style) followed by optional arguments
-#define AXIOM_LOG_FATAL(category, ...)                                                            \
+#define AXIOM_LOG_FATAL(category, ...)                                                             \
     do {                                                                                           \
-        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Fatal, category,        \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Fatal, category,         \
                                                  __VA_ARGS__);                                     \
     } while (false)

@@ -25,9 +25,7 @@ public:
         entries_.push_back({level, category, message});
     }
 
-    void flush() override {
-        flushCount_++;
-    }
+    void flush() override { flushCount_++; }
 
     const std::vector<LogEntry>& getEntries() const {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -45,9 +43,7 @@ public:
         flushCount_ = 0;
     }
 
-    size_t getFlushCount() const {
-        return flushCount_;
-    }
+    size_t getFlushCount() const { return flushCount_; }
 
 private:
     mutable std::mutex mutex_;
@@ -459,8 +455,8 @@ TEST_F(LoggerTest, FilteredLogsHaveMinimalOverhead) {
     double avgMicroseconds = static_cast<double>(duration.count()) / numMessages;
 
     // Filtered logs should be extremely fast (< 1 microsecond)
-    EXPECT_LT(avgMicroseconds, 10.0) << "Average filtered logging time: " << avgMicroseconds
-                                     << " μs";
+    EXPECT_LT(avgMicroseconds, 10.0)
+        << "Average filtered logging time: " << avgMicroseconds << " μs";
 
     // No messages should have been logged
     EXPECT_EQ(testSink_->getEntryCount(), 0);

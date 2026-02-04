@@ -183,6 +183,26 @@ run-example: build-debug ## Run specific example (usage: make run-example EXAMPL
 	@echo "Running example: $(EXAMPLE)"
 	@$(BUILD_DIR_DEBUG)/bin/$(EXAMPLE)
 
+##@ Application
+
+ifeq ($(OS),Windows_NT)
+APP_DEBUG_EXE := $(BUILD_DIR_DEBUG)/bin/Debug/axiom_app.exe
+APP_RELEASE_EXE := $(BUILD_DIR_RELEASE)/bin/Release/axiom_app.exe
+else
+APP_DEBUG_EXE := $(BUILD_DIR_DEBUG)/bin/axiom_app
+APP_RELEASE_EXE := $(BUILD_DIR_RELEASE)/bin/axiom_app
+endif
+
+run: build-debug ## Run the application (Debug)
+	@echo "Running Axiom Physics Engine (Debug)..."
+	@$(APP_DEBUG_EXE)
+
+run-release: build-release ## Run the application (Release)
+	@echo "Running Axiom Physics Engine (Release)..."
+	@$(APP_RELEASE_EXE)
+
+app: run ## Alias for 'run' (Run the application in Debug mode)
+
 ##@ Code Quality
 
 format: ## Format all source files with clang-format

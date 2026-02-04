@@ -3,6 +3,15 @@
 #include "axiom/core/assert.hpp"
 #include "axiom/core/logger.hpp"
 
+// Conditionally include GLFW for extension queries (only if available)
+#ifdef __has_include
+#if __has_include(<GLFW/glfw3.h>)
+#define AXIOM_HAS_GLFW
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#endif
+#endif
+
 #include <algorithm>
 #include <cstring>
 #include <set>
@@ -15,10 +24,10 @@ namespace {
 constexpr const char* kValidationLayerName = "VK_LAYER_KHRONOS_validation";
 
 // Required device extensions
-// Note: Currently no required device extensions
+// VK_KHR_swapchain is required for presentation to window surfaces
 // VK_KHR_synchronization2 is core in Vulkan 1.3, so we don't need it as an extension
-constexpr size_t kDeviceExtensionCount = 0;
-constexpr const char* const* kDeviceExtensions = nullptr;
+constexpr const char* kDeviceExtensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+constexpr size_t kDeviceExtensionCount = sizeof(kDeviceExtensions) / sizeof(kDeviceExtensions[0]);
 
 // Debug messenger callback for validation layer messages
 VKAPI_ATTR VkBool32 VKAPI_CALL
@@ -446,8 +455,18 @@ std::vector<const char*> VkContext::getRequiredInstanceExtensions() const {
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
-    // Add platform-specific surface extensions if needed in the future
-    // For now, we only need compute capabilities, not presentation
+#ifdef AXIOM_HAS_GLFW
+    // Try to query GLFW extensions if GLFW is available and initialized
+    uint32_t glfwExtensionCount = 0;
+    const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+    if (glfwExtensions != nullptr && glfwExtensionCount > 0) {
+        for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
+            extensions.push_back(glfwExtensions[i]);
+        }
+        AXIOM_LOG_INFO("Vulkan", "Added %u GLFW-required Vulkan extensions", glfwExtensionCount);
+    }
+#endif
 
     return extensions;
 }
@@ -455,12 +474,9 @@ std::vector<const char*> VkContext::getRequiredInstanceExtensions() const {
 std::vector<const char*> VkContext::getRequiredDeviceExtensions() const {
     std::vector<const char*> extensions;
 
-    // Add required device extensions
-    // Currently no required extensions
-    if constexpr (kDeviceExtensions != nullptr) {
-        for (size_t i = 0; i < kDeviceExtensionCount; i++) {
-            extensions.push_back(kDeviceExtensions[i]);
-        }
+    // Add required device extensions (swapchain for presentation)
+    for (size_t i = 0; i < kDeviceExtensionCount; i++) {
+        extensions.push_back(kDeviceExtensions[i]);
     }
 
     return extensions;

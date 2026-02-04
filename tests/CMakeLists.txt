@@ -27,6 +27,7 @@ add_executable(axiom_tests
     gpu/vk_command_test.cpp
     gpu/vk_sync_test.cpp
     gpu/vk_swapchain_test.cpp
+    frontend/window_test.cpp
 )
 
 # Link libraries
@@ -36,6 +37,7 @@ target_link_libraries(axiom_tests
         axiom::core
         axiom::memory
         axiom::gpu
+        axiom::frontend
         GTest::gtest
         GTest::gtest_main
 )
