@@ -238,14 +238,30 @@ core::Result<std::vector<uint32_t>> ShaderCompiler::compileSlang(const std::stri
 core::Result<std::vector<uint32_t>> ShaderCompiler::compileSlangFromFile(const std::string& path,
                                                                          ShaderStage stage) {
     // Read Slang/HLSL file
-    std::ifstream file(path);
+    std::ifstream file(path, std::ios::ate);
     if (!file.is_open()) {
         AXIOM_LOG_ERROR("VkShader", "Failed to open Slang shader file: %s", path.c_str());
         return core::Result<std::vector<uint32_t>>::failure(core::ErrorCode::InvalidParameter,
                                                             "Failed to open Slang shader file");
     }
 
-    std::string source((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    // Get file size and read content
+    const auto fileSize = file.tellg();
+    if (fileSize <= 0) {
+        AXIOM_LOG_ERROR("VkShader", "Slang shader file is empty: %s", path.c_str());
+        return core::Result<std::vector<uint32_t>>::failure(core::ErrorCode::InvalidParameter,
+                                                            "Slang shader file is empty");
+    }
+
+    file.seekg(0);
+    std::string source(static_cast<size_t>(fileSize), '\0');
+    file.read(&source[0], fileSize);
+
+    if (!file) {
+        AXIOM_LOG_ERROR("VkShader", "Failed to read Slang shader file: %s", path.c_str());
+        return core::Result<std::vector<uint32_t>>::failure(core::ErrorCode::InvalidParameter,
+                                                            "Failed to read Slang shader file");
+    }
 
     return compileSlang(source, stage, path);
 }
