@@ -46,6 +46,12 @@ const char* errorCodeToString(ErrorCode code) noexcept {
         return "Shader compilation failed";
     case ErrorCode::BufferAllocationFailed:
         return "GPU buffer allocation failed";
+    case ErrorCode::GPU_INVALID_OPERATION:
+        return "Invalid GPU operation or state";
+    case ErrorCode::GPU_TIMEOUT:
+        return "GPU operation timed out";
+    case ErrorCode::GPU_OPERATION_FAILED:
+        return "GPU operation failed";
 
     // Validation errors (600-699)
     case ErrorCode::InvalidParameter:
