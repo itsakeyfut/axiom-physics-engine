@@ -2,6 +2,7 @@
 
 #include "axiom/gpu/vk_instance.hpp"
 
+#include <cstring>
 #include <gtest/gtest.h>
 
 using namespace axiom::gpu;
