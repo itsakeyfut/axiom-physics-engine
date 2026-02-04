@@ -299,9 +299,16 @@ void JobSystem::wait(JobHandle handle) {
         if (workJob) {
             executeJob(workJob, threadIdx);
         } else {
-            // No work available: yield CPU to give workers a chance to execute
-            // Longer sleep in CI environments helps prevent starvation
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            // No work available for this thread
+            // Use adaptive waiting: yield if work exists, sleep if idle
+            uint32_t active = activeJobs_.load(std::memory_order_relaxed);
+            if (active > 0) {
+                // Work exists but not available to us - yield to workers
+                std::this_thread::yield();
+            } else {
+                // System idle - brief sleep to reduce CPU usage
+                std::this_thread::sleep_for(std::chrono::microseconds(100));
+            }
         }
     }
 }
@@ -336,17 +343,17 @@ void JobSystem::workerMain(uint32_t threadIndex) {
         if (job) {
             executeJob(job, threadIndex);
         } else {
-            // No work available: wait briefly to avoid busy-waiting
-            // This is critical for CI environments with limited cores
-            std::unique_lock<std::mutex> lock(wakeMutex_);
-
-            // Always wait with a short timeout, regardless of activeJobs count
-            // This prevents starvation when jobs are queued but not yet stealable
-            wakeCondition_.wait_for(lock, std::chrono::milliseconds(1));
-
-            // Check running_ after wake to ensure shutdown responsiveness
-            if (!running_.load(std::memory_order_acquire)) {
-                break;
+            // No work available: use adaptive waiting strategy
+            // Check if there are active jobs that might become available
+            if (activeJobs_.load(std::memory_order_relaxed) > 0) {
+                // Jobs exist but not yet available (e.g., being queued or stolen)
+                // Yield CPU briefly to let other threads make progress
+                std::this_thread::yield();
+            } else {
+                // No jobs in system: wait on condition variable with timeout
+                // Longer timeout reduces CPU usage when idle
+                std::unique_lock<std::mutex> lock(wakeMutex_);
+                wakeCondition_.wait_for(lock, std::chrono::milliseconds(10));
             }
         }
     }
