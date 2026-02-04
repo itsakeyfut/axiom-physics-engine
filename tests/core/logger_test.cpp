@@ -252,14 +252,14 @@ TEST_F(LoggerTest, FlushCallsFlushOnAllSinks) {
 //=============================================================================
 
 TEST_F(LoggerTest, ThreadSafeConcurrentLogging) {
-    const int numThreads = 10;
-    const int messagesPerThread = 100;
+    constexpr int numThreads = 10;
+    constexpr int messagesPerThread = 100;
 
     std::vector<std::thread> threads;
     threads.reserve(numThreads);
 
     for (int i = 0; i < numThreads; ++i) {
-        threads.emplace_back([i, messagesPerThread]() {
+        threads.emplace_back([i]() {
             for (int j = 0; j < messagesPerThread; ++j) {
                 AXIOM_LOG_INFO("Thread", "Thread %d, Message %d", i, j);
             }
@@ -362,8 +362,16 @@ TEST(FileLogSinkTest, CreatesAndWritesToFile) {
 
     {
         std::ifstream file(filename);
+        // GCC 13 has false positive null-dereference warnings with istreambuf_iterator
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 13
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
         std::string content((std::istreambuf_iterator<char>(file)),
                             std::istreambuf_iterator<char>());
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 13
+#pragma GCC diagnostic pop
+#endif
 
         EXPECT_NE(content.find("Test message 1"), std::string::npos);
         EXPECT_NE(content.find("Test message 2"), std::string::npos);
