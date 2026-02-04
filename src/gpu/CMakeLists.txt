@@ -5,6 +5,7 @@ set(GPU_SOURCES
     vk_instance.cpp
     vk_memory.cpp
     vk_command.cpp
+    vk_sync.cpp
 )
 
 # Header files (for IDE integration)
@@ -12,6 +13,7 @@ set(GPU_HEADERS
     ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_instance.hpp
     ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_memory.hpp
     ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_command.hpp
+    ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_sync.hpp
 )
 
 # Create library target

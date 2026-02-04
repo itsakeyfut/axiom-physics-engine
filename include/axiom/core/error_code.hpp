@@ -45,6 +45,9 @@ enum class ErrorCode {
     VulkanInitializationFailed = 500,  ///< Vulkan initialization failed
     ShaderCompilationFailed,           ///< Shader compilation failed
     BufferAllocationFailed,            ///< GPU buffer allocation failed
+    GPU_INVALID_OPERATION,             ///< Invalid GPU operation or state
+    GPU_TIMEOUT,                       ///< GPU operation timed out
+    GPU_OPERATION_FAILED,              ///< GPU operation failed
 
     // Validation errors (600-699)
     InvalidParameter = 600,  ///< Function parameter is invalid
