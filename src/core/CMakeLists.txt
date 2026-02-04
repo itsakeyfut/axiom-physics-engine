@@ -6,6 +6,7 @@ set(AXIOM_CORE_SOURCES
     version.cpp
     error_code.cpp
     assert.cpp
+    logger.cpp
 )
 
 # Header files (for IDE organization)
@@ -15,6 +16,7 @@ set(AXIOM_CORE_HEADERS
     ${CMAKE_SOURCE_DIR}/include/axiom/core/result.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/core/assert.hpp
     ${CMAKE_SOURCE_DIR}/include/axiom/core/profiler.hpp
+    ${CMAKE_SOURCE_DIR}/include/axiom/core/logger.hpp
 )
 
 # Create library target
@@ -41,7 +43,7 @@ target_include_directories(axiom_core
 # Link dependencies
 target_link_libraries(axiom_core
     PUBLIC
-        # Future: Add spdlog for logging
+        spdlog::spdlog
     PRIVATE
         # Internal dependencies
 )

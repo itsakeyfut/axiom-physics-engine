@@ -1,6 +1,7 @@
 #include "axiom/gpu/vk_swapchain.hpp"
 
 #include "axiom/core/assert.hpp"
+#include "axiom/core/logger.hpp"
 #include "axiom/gpu/vk_instance.hpp"
 
 #include <algorithm>
@@ -206,8 +207,8 @@ core::Result<void> Swapchain::createSwapchain() {
         }
     }
 
-    // TODO: Add logging when logger is implemented (Issue #022)
-    // AXIOM_LOG_INFO("GPU", "Swapchain created: {}x{}, format={}, imageCount={}", ...);
+    AXIOM_LOG_INFO("GPU", "Swapchain created: %ux%u, format=%u, imageCount=%zu", config_.width,
+                   config_.height, static_cast<uint32_t>(format_), images_.size());
 
     return core::Result<void>::success();
 }
@@ -251,11 +252,9 @@ AcquireResult Swapchain::acquireNextImage(VkSemaphore signalSemaphore, uint64_t 
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
         acquireResult.needsResize = true;
-        // TODO: Add logging when logger is implemented (Issue #022)
-        // AXIOM_LOG_WARN("GPU", "Swapchain out of date or suboptimal, resize needed");
+        AXIOM_LOG_WARN("GPU", "Swapchain out of date or suboptimal, resize needed");
     } else if (result != VK_SUCCESS) {
-        // TODO: Add logging when logger is implemented (Issue #022)
-        // AXIOM_LOG_ERROR("GPU", "Failed to acquire swapchain image: {}", ...);
+        AXIOM_LOG_ERROR("GPU", "Failed to acquire swapchain image: VkResult=%d", result);
         acquireResult.needsResize = true;
     }
 
@@ -280,12 +279,10 @@ bool Swapchain::present(VkQueue queue, const PresentInfo& info) {
     VkResult result = vkQueuePresentKHR(queue, &presentInfo);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-        // TODO: Add logging when logger is implemented (Issue #022)
-        // AXIOM_LOG_WARN("GPU", "Swapchain out of date during present, resize needed");
+        AXIOM_LOG_WARN("GPU", "Swapchain out of date during present, resize needed");
         return false;
     } else if (result != VK_SUCCESS) {
-        // TODO: Add logging when logger is implemented (Issue #022)
-        // AXIOM_LOG_ERROR("GPU", "Failed to present swapchain image: {}", ...);
+        AXIOM_LOG_ERROR("GPU", "Failed to present swapchain image: VkResult=%d", result);
         return false;
     }
 
@@ -299,8 +296,8 @@ core::Result<void> Swapchain::resize(uint32_t width, uint32_t height) {
                                            "Invalid dimensions for resize");
     }
 
-    // TODO: Add logging when logger is implemented (Issue #022)
-    // AXIOM_LOG_INFO("GPU", "Resizing swapchain from {}x{} to {}x{}", ...);
+    AXIOM_LOG_INFO("GPU", "Resizing swapchain from %ux%u to %ux%u", config_.width, config_.height,
+                   width, height);
 
     // Wait for device to be idle before recreating swapchain
     vkDeviceWaitIdle(context_->getDevice());
@@ -336,8 +333,7 @@ Swapchain::chooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats) c
     }
 
     // If no suitable format found, return the first available
-    // TODO: Add logging when logger is implemented (Issue #022)
-    // AXIOM_LOG_WARN("GPU", "Preferred sRGB format not found, using first available format");
+    AXIOM_LOG_WARN("GPU", "Preferred sRGB format not found, using first available format");
     return formats[0];
 }
 

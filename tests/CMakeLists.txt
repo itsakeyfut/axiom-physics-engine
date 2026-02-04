@@ -5,6 +5,7 @@ add_executable(axiom_tests
     core/error_code_test.cpp
     core/result_test.cpp
     core/assert_test.cpp
+    core/logger_test.cpp
     core/test_profiler.cpp
     math/test_vec.cpp
     math/test_vec_ops.cpp

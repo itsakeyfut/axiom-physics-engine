@@ -1,9 +1,11 @@
 #include "axiom/gpu/vk_memory.hpp"
 
 #include "axiom/core/assert.hpp"
+#include "axiom/core/logger.hpp"
 #include "axiom/gpu/vk_instance.hpp"
 
 #include <cstdio>
+#include <sstream>
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
@@ -196,26 +198,28 @@ VkMemoryManager::MemoryStats VkMemoryManager::getStats() const {
 void VkMemoryManager::printStats() const {
     auto stats = getStats();
 
-    fprintf(stdout, "\n========================================\n");
-    fprintf(stdout, "VULKAN MEMORY STATISTICS\n");
-    fprintf(stdout, "========================================\n");
-    fprintf(stdout, "Used memory:       %llu bytes (%.2f MB)\n",
-            static_cast<unsigned long long>(stats.usedBytes),
-            static_cast<double>(stats.usedBytes) / (1024.0 * 1024.0));
-    fprintf(stdout, "Allocated memory:  %llu bytes (%.2f MB)\n",
-            static_cast<unsigned long long>(stats.allocatedBytes),
-            static_cast<double>(stats.allocatedBytes) / (1024.0 * 1024.0));
-    fprintf(stdout, "Allocations:       %u\n", stats.allocationCount);
-    fprintf(stdout, "Memory blocks:     %u\n", stats.blockCount);
+    std::ostringstream oss;
+    oss << "\n========================================\n";
+    oss << "VULKAN MEMORY STATISTICS\n";
+    oss << "========================================\n";
+    oss << "Used memory:       " << static_cast<unsigned long long>(stats.usedBytes) << " bytes ("
+        << static_cast<double>(stats.usedBytes) / (1024.0 * 1024.0) << " MB)\n";
+    oss << "Allocated memory:  " << static_cast<unsigned long long>(stats.allocatedBytes)
+        << " bytes (" << static_cast<double>(stats.allocatedBytes) / (1024.0 * 1024.0)
+        << " MB)\n";
+    oss << "Allocations:       " << stats.allocationCount << "\n";
+    oss << "Memory blocks:     " << stats.blockCount << "\n";
 
     if (stats.allocatedBytes > 0) {
         double utilization = (static_cast<double>(stats.usedBytes) /
                               static_cast<double>(stats.allocatedBytes)) *
                              100.0;
-        fprintf(stdout, "Utilization:       %.2f%%\n", utilization);
+        oss << "Utilization:       " << utilization << "%\n";
     }
 
-    fprintf(stdout, "========================================\n\n");
+    oss << "========================================";
+
+    AXIOM_LOG_INFO("GPU", "%s", oss.str().c_str());
 }
 
 }  // namespace axiom::gpu
