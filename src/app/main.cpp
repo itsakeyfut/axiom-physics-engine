@@ -48,13 +48,12 @@ int main() {
     });
 
     // Setup key callback for ESC to close
-    window->setKeyCallback([&window](int key, int /*scancode*/, int action, int /*mods*/) {
+    window->setKeyCallback([](int key, int /*scancode*/, int action, int /*mods*/) {
         if (key == 256 && action == 1) {  // ESC key pressed (GLFW_KEY_ESCAPE = 256, GLFW_PRESS =
                                           // 1)
             AXIOM_LOG_INFO("App", "ESC pressed - closing window");
-            // Set window should close by getting the native handle
-            // Since we don't have direct access to glfwSetWindowShouldClose in the API,
-            // we'll just log it for now
+            // Note: Window closing is handled by the window's native close button
+            // A future enhancement could add Window::setShouldClose() method
         }
     });
 
