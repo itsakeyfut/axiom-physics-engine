@@ -154,71 +154,59 @@ private:
 // Logging Macros
 //=============================================================================
 
-// Suppress warnings about GNU ##__VA_ARGS__ extension (supported by all major compilers)
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-#endif
-
-// Helper macro to handle optional variadic arguments portably
-// MSVC, GCC, and Clang all support ##__VA_ARGS__ extension
-#define AXIOM_LOG_IMPL(level, category, format, ...)                                              \
-    ::axiom::core::Logger::getInstance().log(level, category, format, ##__VA_ARGS__)
+// Note: We use variadic macros where format and arguments are all part of __VA_ARGS__
+// This avoids issues with ##__VA_ARGS__ across different compilers
 
 /// Log a trace message
 /// @param category The category/module name (e.g., "GPU", "Physics")
-/// @param format Format string (printf-style)
-/// @param ... Format arguments
-#define AXIOM_LOG_TRACE(category, format, ...)                                                    \
+/// @param ... Format string (printf-style) followed by optional arguments
+#define AXIOM_LOG_TRACE(category, ...)                                                            \
     do {                                                                                           \
-        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Trace, category, format, __VA_ARGS__);            \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Trace, category,        \
+                                                 __VA_ARGS__);                                     \
     } while (false)
 
 /// Log a debug message
 /// @param category The category/module name (e.g., "GPU", "Physics")
-/// @param format Format string (printf-style)
-/// @param ... Format arguments
-#define AXIOM_LOG_DEBUG(category, format, ...)                                                    \
+/// @param ... Format string (printf-style) followed by optional arguments
+#define AXIOM_LOG_DEBUG(category, ...)                                                            \
     do {                                                                                           \
-        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Debug, category, format, __VA_ARGS__);            \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Debug, category,        \
+                                                 __VA_ARGS__);                                     \
     } while (false)
 
 /// Log an info message
 /// @param category The category/module name (e.g., "GPU", "Physics")
-/// @param format Format string (printf-style)
-/// @param ... Format arguments
-#define AXIOM_LOG_INFO(category, format, ...)                                                     \
+/// @param ... Format string (printf-style) followed by optional arguments
+#define AXIOM_LOG_INFO(category, ...)                                                             \
     do {                                                                                           \
-        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Info, category, format, __VA_ARGS__);             \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Info, category,         \
+                                                 __VA_ARGS__);                                     \
     } while (false)
 
 /// Log a warning message
 /// @param category The category/module name (e.g., "GPU", "Physics")
-/// @param format Format string (printf-style)
-/// @param ... Format arguments
-#define AXIOM_LOG_WARN(category, format, ...)                                                     \
+/// @param ... Format string (printf-style) followed by optional arguments
+#define AXIOM_LOG_WARN(category, ...)                                                             \
     do {                                                                                           \
-        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Warning, category, format, __VA_ARGS__);          \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Warning, category,      \
+                                                 __VA_ARGS__);                                     \
     } while (false)
 
 /// Log an error message
 /// @param category The category/module name (e.g., "GPU", "Physics")
-/// @param format Format string (printf-style)
-/// @param ... Format arguments
-#define AXIOM_LOG_ERROR(category, format, ...)                                                    \
+/// @param ... Format string (printf-style) followed by optional arguments
+#define AXIOM_LOG_ERROR(category, ...)                                                            \
     do {                                                                                           \
-        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Error, category, format, __VA_ARGS__);            \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Error, category,        \
+                                                 __VA_ARGS__);                                     \
     } while (false)
 
 /// Log a fatal message
 /// @param category The category/module name (e.g., "GPU", "Physics")
-/// @param format Format string (printf-style)
-/// @param ... Format arguments
-#define AXIOM_LOG_FATAL(category, format, ...)                                                    \
+/// @param ... Format string (printf-style) followed by optional arguments
+#define AXIOM_LOG_FATAL(category, ...)                                                            \
     do {                                                                                           \
-        AXIOM_LOG_IMPL(::axiom::core::LogLevel::Fatal, category, format, __VA_ARGS__);            \
+        ::axiom::core::Logger::getInstance().log(::axiom::core::LogLevel::Fatal, category,        \
+                                                 __VA_ARGS__);                                     \
     } while (false)
-
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#endif
