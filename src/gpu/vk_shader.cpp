@@ -42,7 +42,7 @@ core::Result<std::vector<uint32_t>> readBinaryFile(const std::string& path) {
     // Read file into buffer
     std::vector<uint32_t> buffer(fileSize / sizeof(uint32_t));
     file.seekg(0);
-    file.read(reinterpret_cast<char*>(buffer.data()), fileSize);
+    file.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(fileSize));
 
     if (!file) {
         AXIOM_LOG_ERROR("VkShader", "Failed to read shader file: %s", path.c_str());
