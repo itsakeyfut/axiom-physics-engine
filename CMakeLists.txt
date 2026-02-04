@@ -134,6 +134,8 @@ endif()
 # Find packages
 find_package(glm CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(Vulkan REQUIRED)
+find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 
 if(AXIOM_BUILD_TESTS)
     find_package(GTest CONFIG REQUIRED)

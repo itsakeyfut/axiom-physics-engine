@@ -20,7 +20,6 @@
  */
 
 #include <axiom/core/profiler.hpp>
-
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -184,16 +183,14 @@ int main() {
 #else
     std::cout << "Profiling is DISABLED\n";
     std::cout << "To enable profiling, build with:\n";
-    std::cout
-        << "  cmake --preset windows-relwithdebinfo -DAXIOM_ENABLE_PROFILING=ON\n\n";
+    std::cout << "  cmake --preset windows-relwithdebinfo -DAXIOM_ENABLE_PROFILING=ON\n\n";
 #endif
 
     // Create physics world with 50 objects
     constexpr size_t numObjects = 50;
     PhysicsWorld world(numObjects);
 
-    std::cout << "Running physics simulation with " << world.getObjectCount()
-              << " objects...\n";
+    std::cout << "Running physics simulation with " << world.getObjectCount() << " objects...\n";
     std::cout << "Simulating 60 frames (1 second at 60 FPS)...\n\n";
 
     // Simulate 60 frames (1 second at 60 FPS)
@@ -209,20 +206,17 @@ int main() {
 
         // Print progress every 10 frames
         if ((frame + 1) % 10 == 0) {
-            std::cout << "Frame " << (frame + 1) << "/" << numFrames
-                      << " completed\n";
+            std::cout << "Frame " << (frame + 1) << "/" << numFrames << " completed\n";
         }
     }
 
     auto endTime = std::chrono::high_resolution_clock::now();
     auto duration =
-        std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime)
-            .count();
+        std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 
     std::cout << "\nSimulation completed in " << duration << " ms\n";
     std::cout << "Average frame time: "
-              << (static_cast<double>(duration) / static_cast<double>(numFrames))
-              << " ms\n";
+              << (static_cast<double>(duration) / static_cast<double>(numFrames)) << " ms\n";
 
 #ifdef AXIOM_ENABLE_PROFILING
     std::cout << "\nProfiling data has been sent to Tracy.\n";

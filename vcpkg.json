@@ -21,6 +21,12 @@
     {
       "name": "benchmark",
       "version>=": "1.8.0"
+    },
+    {
+      "name": "vulkan"
+    },
+    {
+      "name": "vulkan-memory-allocator"
     }
   ],
   "features": {
