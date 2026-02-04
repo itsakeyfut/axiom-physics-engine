@@ -208,7 +208,7 @@ core::Result<void> CommandBuffer::submitAndWait(VkQueue queue) {
     }
 
     // Submit with fence
-    SubmitInfo info;
+    SubmitInfo info{};
     info.fence = fence;
     auto submitResult = submit(queue, info);
 

@@ -194,7 +194,7 @@ TEST_F(VkCommandTest, CommandBufferSubmitWithEmptyInfo) {
     cmd.end();
 
     // Submit with default (empty) info
-    CommandBuffer::SubmitInfo info;
+    CommandBuffer::SubmitInfo info{};
     auto submitResult = cmd.submit(context_->getGraphicsQueue(), info);
     EXPECT_TRUE(submitResult.isSuccess());
 
