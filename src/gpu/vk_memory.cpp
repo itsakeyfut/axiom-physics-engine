@@ -10,8 +10,7 @@
 
 namespace axiom::gpu {
 
-VkMemoryManager::VkMemoryManager(VkContext* context)
-    : context_(context), allocator_(nullptr) {
+VkMemoryManager::VkMemoryManager(VkContext* context) : context_(context), allocator_(nullptr) {
     AXIOM_ASSERT(context != nullptr, "VkContext must not be null");
 }
 
@@ -33,7 +32,7 @@ core::Result<std::unique_ptr<VkMemoryManager>> VkMemoryManager::create(VkContext
     auto result = manager->initialize();
     if (result.isFailure()) {
         return core::Result<std::unique_ptr<VkMemoryManager>>::failure(result.errorCode(),
-                                                                        result.errorMessage());
+                                                                       result.errorMessage());
     }
 
     return core::Result<std::unique_ptr<VkMemoryManager>>::success(std::move(manager));
@@ -59,21 +58,20 @@ core::Result<void> VkMemoryManager::initialize() {
 
 int VkMemoryManager::toVmaMemoryUsage(MemoryUsage usage) const noexcept {
     switch (usage) {
-        case MemoryUsage::GpuOnly:
-            return VMA_MEMORY_USAGE_GPU_ONLY;
-        case MemoryUsage::CpuToGpu:
-            return VMA_MEMORY_USAGE_CPU_TO_GPU;
-        case MemoryUsage::GpuToCpu:
-            return VMA_MEMORY_USAGE_GPU_TO_CPU;
-        case MemoryUsage::CpuOnly:
-            return VMA_MEMORY_USAGE_CPU_ONLY;
-        default:
-            return VMA_MEMORY_USAGE_UNKNOWN;
+    case MemoryUsage::GpuOnly:
+        return VMA_MEMORY_USAGE_GPU_ONLY;
+    case MemoryUsage::CpuToGpu:
+        return VMA_MEMORY_USAGE_CPU_TO_GPU;
+    case MemoryUsage::GpuToCpu:
+        return VMA_MEMORY_USAGE_GPU_TO_CPU;
+    case MemoryUsage::CpuOnly:
+        return VMA_MEMORY_USAGE_CPU_ONLY;
+    default:
+        return VMA_MEMORY_USAGE_UNKNOWN;
     }
 }
 
-core::Result<VkMemoryManager::Buffer> VkMemoryManager::createBuffer(
-    const BufferCreateInfo& info) {
+core::Result<VkMemoryManager::Buffer> VkMemoryManager::createBuffer(const BufferCreateInfo& info) {
     // Create buffer create info
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -94,9 +92,8 @@ core::Result<VkMemoryManager::Buffer> VkMemoryManager::createBuffer(
     VmaAllocation allocation;
     VmaAllocationInfo allocationInfo;
 
-    VkResult result =
-        vmaCreateBuffer(static_cast<VmaAllocator>(allocator_), &bufferInfo, &allocInfo,
-                        &buffer.buffer, &allocation, &allocationInfo);
+    VkResult result = vmaCreateBuffer(static_cast<VmaAllocator>(allocator_), &bufferInfo,
+                                      &allocInfo, &buffer.buffer, &allocation, &allocationInfo);
 
     if (result != VK_SUCCESS) {
         return core::Result<Buffer>::failure(core::ErrorCode::BufferAllocationFailed,
@@ -212,9 +209,9 @@ void VkMemoryManager::printStats() const {
     fprintf(stdout, "Memory blocks:     %u\n", stats.blockCount);
 
     if (stats.allocatedBytes > 0) {
-        double utilization =
-            (static_cast<double>(stats.usedBytes) / static_cast<double>(stats.allocatedBytes)) *
-            100.0;
+        double utilization = (static_cast<double>(stats.usedBytes) /
+                              static_cast<double>(stats.allocatedBytes)) *
+                             100.0;
         fprintf(stdout, "Utilization:       %.2f%%\n", utilization);
     }
 

@@ -1,9 +1,9 @@
+#include "axiom/gpu/vk_instance.hpp"
 #include "axiom/gpu/vk_memory.hpp"
 
-#include "axiom/gpu/vk_instance.hpp"
+#include <gtest/gtest.h>
 
 #include <cstring>
-#include <gtest/gtest.h>
 
 using namespace axiom::gpu;
 using namespace axiom::core;
@@ -22,8 +22,7 @@ protected:
             if (managerResult.isSuccess()) {
                 manager_ = std::move(managerResult.value());
             } else {
-                GTEST_SKIP() << "Failed to create memory manager: "
-                             << managerResult.errorMessage();
+                GTEST_SKIP() << "Failed to create memory manager: " << managerResult.errorMessage();
             }
         } else {
             GTEST_SKIP() << "Vulkan not available: " << contextResult.errorMessage()
@@ -145,10 +144,10 @@ TEST_F(VkMemoryManagerTest, MapAndUnmapMemory) {
 TEST_F(VkMemoryManagerTest, CreateImage) {
     ASSERT_NE(manager_, nullptr);
 
-    VkMemoryManager::ImageCreateInfo info{
-        .extent = {256, 256, 1},
-        .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT};
+    VkMemoryManager::ImageCreateInfo info{.extent = {256, 256, 1},
+                                          .format = VK_FORMAT_R8G8B8A8_UNORM,
+                                          .usage = VK_IMAGE_USAGE_SAMPLED_BIT |
+                                                   VK_IMAGE_USAGE_TRANSFER_DST_BIT};
 
     auto result = manager_->createImage(info);
     ASSERT_TRUE(result.isSuccess());
@@ -277,7 +276,7 @@ TEST_F(VkMemoryManagerTest, LargeAllocation) {
 TEST_F(VkMemoryManagerTest, DestroyNullBuffer) {
     ASSERT_NE(manager_, nullptr);
 
-    VkMemoryManager::Buffer buffer;  // Default initialized to VK_NULL_HANDLE
+    VkMemoryManager::Buffer buffer;   // Default initialized to VK_NULL_HANDLE
     manager_->destroyBuffer(buffer);  // Should not crash
 }
 
@@ -285,7 +284,7 @@ TEST_F(VkMemoryManagerTest, DestroyNullBuffer) {
 TEST_F(VkMemoryManagerTest, DestroyNullImage) {
     ASSERT_NE(manager_, nullptr);
 
-    VkMemoryManager::Image image;  // Default initialized to VK_NULL_HANDLE
+    VkMemoryManager::Image image;   // Default initialized to VK_NULL_HANDLE
     manager_->destroyImage(image);  // Should not crash
 }
 
@@ -311,8 +310,8 @@ TEST_F(VkMemoryManagerTest, CreateReadbackBuffer) {
 TEST_F(VkMemoryManagerTest, AllMemoryUsageTypes) {
     ASSERT_NE(manager_, nullptr);
 
-    MemoryUsage usageTypes[] = {MemoryUsage::GpuOnly, MemoryUsage::CpuToGpu,
-                                MemoryUsage::GpuToCpu, MemoryUsage::CpuOnly};
+    MemoryUsage usageTypes[] = {MemoryUsage::GpuOnly, MemoryUsage::CpuToGpu, MemoryUsage::GpuToCpu,
+                                MemoryUsage::CpuOnly};
 
     for (auto usage : usageTypes) {
         VkMemoryManager::BufferCreateInfo info{.size = 1024,
