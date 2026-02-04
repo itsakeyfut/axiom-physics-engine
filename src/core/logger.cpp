@@ -91,20 +91,20 @@ std::string formatLogMessage(LogLevel level, const char* category, const char* m
 
 const char* logLevelToString(LogLevel level) noexcept {
     switch (level) {
-        case LogLevel::Trace:
-            return "TRACE";
-        case LogLevel::Debug:
-            return "DEBUG";
-        case LogLevel::Info:
-            return "INFO ";
-        case LogLevel::Warning:
-            return "WARN ";
-        case LogLevel::Error:
-            return "ERROR";
-        case LogLevel::Fatal:
-            return "FATAL";
-        default:
-            return "UNKNOWN";
+    case LogLevel::Trace:
+        return "TRACE";
+    case LogLevel::Debug:
+        return "DEBUG";
+    case LogLevel::Info:
+        return "INFO ";
+    case LogLevel::Warning:
+        return "WARN ";
+    case LogLevel::Error:
+        return "ERROR";
+    case LogLevel::Fatal:
+        return "FATAL";
+    default:
+        return "UNKNOWN";
     }
 }
 
@@ -120,24 +120,24 @@ void ConsoleLogSink::write(LogLevel level, const char* category, const char* mes
     if (useColors_) {
         const char* color = ansi::Reset;
         switch (level) {
-            case LogLevel::Trace:
-                color = ansi::Gray;
-                break;
-            case LogLevel::Debug:
-                color = ansi::Cyan;
-                break;
-            case LogLevel::Info:
-                color = ansi::Green;
-                break;
-            case LogLevel::Warning:
-                color = ansi::Yellow;
-                break;
-            case LogLevel::Error:
-                color = ansi::Red;
-                break;
-            case LogLevel::Fatal:
-                color = ansi::BrightRed;
-                break;
+        case LogLevel::Trace:
+            color = ansi::Gray;
+            break;
+        case LogLevel::Debug:
+            color = ansi::Cyan;
+            break;
+        case LogLevel::Info:
+            color = ansi::Green;
+            break;
+        case LogLevel::Warning:
+            color = ansi::Yellow;
+            break;
+        case LogLevel::Error:
+            color = ansi::Red;
+            break;
+        case LogLevel::Fatal:
+            color = ansi::BrightRed;
+            break;
         }
 
         fprintf(stdout, "%s%s%s\n", color, formatted.c_str(), ansi::Reset);
@@ -155,7 +155,10 @@ void ConsoleLogSink::flush() {
 //=============================================================================
 
 FileLogSink::FileLogSink(const std::string& filename, size_t maxFileSize, size_t maxFiles)
-    : filename_(filename), maxFileSize_(maxFileSize), maxFiles_(maxFiles), currentSize_(0),
+    : filename_(filename),
+      maxFileSize_(maxFileSize),
+      maxFiles_(maxFiles),
+      currentSize_(0),
       fileHandle_(nullptr) {
     openFile();
 }

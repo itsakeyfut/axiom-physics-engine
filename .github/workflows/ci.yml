@@ -72,13 +72,15 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc'
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build g++
+          sudo apt-get install -y ninja-build g++ \
+            libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 
       - name: Install dependencies (Linux - Clang)
         if: matrix.os == 'ubuntu-latest' && matrix.compiler == 'clang'
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build clang
+          sudo apt-get install -y ninja-build clang \
+            libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
@@ -171,7 +173,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build g++ lcov
+          sudo apt-get install -y ninja-build g++ lcov \
+            libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 
       - name: Configure CMake with coverage
         run: |
@@ -234,7 +237,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build clang clang-tidy
+          sudo apt-get install -y ninja-build clang clang-tidy \
+            libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 
       - name: Configure CMake
         run: |

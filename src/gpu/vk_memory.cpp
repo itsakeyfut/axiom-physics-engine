@@ -205,8 +205,7 @@ void VkMemoryManager::printStats() const {
     oss << "Used memory:       " << static_cast<unsigned long long>(stats.usedBytes) << " bytes ("
         << static_cast<double>(stats.usedBytes) / (1024.0 * 1024.0) << " MB)\n";
     oss << "Allocated memory:  " << static_cast<unsigned long long>(stats.allocatedBytes)
-        << " bytes (" << static_cast<double>(stats.allocatedBytes) / (1024.0 * 1024.0)
-        << " MB)\n";
+        << " bytes (" << static_cast<double>(stats.allocatedBytes) / (1024.0 * 1024.0) << " MB)\n";
     oss << "Allocations:       " << stats.allocationCount << "\n";
     oss << "Memory blocks:     " << stats.blockCount << "\n";
 

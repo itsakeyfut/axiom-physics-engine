@@ -24,6 +24,7 @@ target_link_libraries(vk_test
     PRIVATE
         axiom::gpu
         axiom::core
+        glfw
 )
 
 set_target_properties(vk_test PROPERTIES
@@ -39,6 +40,7 @@ target_link_libraries(command_buffer_example
     PRIVATE
         axiom::gpu
         axiom::core
+        glfw
 )
 
 set_target_properties(command_buffer_example PROPERTIES
