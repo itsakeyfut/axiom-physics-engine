@@ -25,6 +25,7 @@ add_executable(axiom_tests
     gpu/vk_memory_test.cpp
     gpu/vk_command_test.cpp
     gpu/vk_sync_test.cpp
+    gpu/vk_swapchain_test.cpp
 )
 
 # Link libraries
