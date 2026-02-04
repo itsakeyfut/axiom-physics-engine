@@ -13,6 +13,11 @@ protected:
         auto result = VkContext::create();
         if (result.isSuccess()) {
             context_ = std::move(result.value());
+        } else {
+            // Vulkan not available in this environment (common in CI)
+            // Skip tests gracefully
+            GTEST_SKIP() << "Vulkan not available: " << result.errorMessage()
+                         << " (this is expected in CI environments without GPU)";
         }
     }
 
@@ -124,6 +129,13 @@ TEST(VkContextMoveTest, NotMovable) {
 
 // Test multiple context destruction (should be safe)
 TEST(VkContextLifetimeTest, MultipleContexts) {
+    // Check if Vulkan is available first
+    auto testResult = VkContext::create();
+    if (testResult.isFailure()) {
+        GTEST_SKIP() << "Vulkan not available: " << testResult.errorMessage()
+                     << " (this is expected in CI environments without GPU)";
+    }
+
     // Create and destroy multiple contexts sequentially
     for (int i = 0; i < 3; i++) {
         auto result = VkContext::create();
