@@ -300,15 +300,9 @@ void JobSystem::wait(JobHandle handle) {
             executeJob(workJob, threadIdx);
         } else {
             // No work available for this thread
-            // Use adaptive waiting: yield if work exists, sleep if idle
-            uint32_t active = activeJobs_.load(std::memory_order_relaxed);
-            if (active > 0) {
-                // Work exists but not available to us - yield to workers
-                std::this_thread::yield();
-            } else {
-                // System idle - brief sleep to reduce CPU usage
-                std::this_thread::sleep_for(std::chrono::microseconds(100));
-            }
+            // Brief sleep to give workers a chance to execute
+            // Active jobs > 0 means work exists but isn't available to this thread
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
         }
     }
 }
@@ -347,8 +341,8 @@ void JobSystem::workerMain(uint32_t threadIndex) {
             // Check if there are active jobs that might become available
             if (activeJobs_.load(std::memory_order_relaxed) > 0) {
                 // Jobs exist but not yet available (e.g., being queued or stolen)
-                // Yield CPU briefly to let other threads make progress
-                std::this_thread::yield();
+                // Brief sleep ensures other threads get CPU time (critical for Windows CI)
+                std::this_thread::sleep_for(std::chrono::microseconds(100));
             } else {
                 // No jobs in system: wait on condition variable with timeout
                 // Longer timeout reduces CPU usage when idle
