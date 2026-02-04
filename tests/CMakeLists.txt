@@ -27,6 +27,7 @@ add_executable(axiom_tests
     gpu/vk_command_test.cpp
     gpu/vk_sync_test.cpp
     gpu/vk_swapchain_test.cpp
+    gpu/vk_shader_test.cpp
     frontend/window_test.cpp
 )
 
