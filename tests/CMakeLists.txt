@@ -22,6 +22,7 @@ add_executable(axiom_tests
     memory/stl_adapter_test.cpp
     memory/memory_tracker_test.cpp
     gpu/vk_instance_test.cpp
+    gpu/vk_memory_test.cpp
 )
 
 # Link libraries
