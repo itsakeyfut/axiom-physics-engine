@@ -15,4 +15,19 @@ set_target_properties(profiling_example PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
-message(STATUS "Examples configured: profiling_example")
+# Vulkan test - demonstrates Vulkan context creation
+add_executable(vk_test
+    vk_test.cpp
+)
+
+target_link_libraries(vk_test
+    PRIVATE
+        axiom::gpu
+        axiom::core
+)
+
+set_target_properties(vk_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
+message(STATUS "Examples configured: profiling_example, vk_test")

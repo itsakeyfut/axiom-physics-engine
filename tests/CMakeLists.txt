@@ -21,6 +21,7 @@ add_executable(axiom_tests
     memory/stack_allocator_test.cpp
     memory/stl_adapter_test.cpp
     memory/memory_tracker_test.cpp
+    gpu/vk_instance_test.cpp
 )
 
 # Link libraries
@@ -29,6 +30,7 @@ target_link_libraries(axiom_tests
         axiom::math
         axiom::core
         axiom::memory
+        axiom::gpu
         GTest::gtest
         GTest::gtest_main
 )

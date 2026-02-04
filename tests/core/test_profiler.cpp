@@ -3,9 +3,9 @@
  * @brief Unit tests for profiling infrastructure
  */
 
-#include <axiom/core/profiler.hpp>
 #include <gtest/gtest.h>
 
+#include <axiom/core/profiler.hpp>
 #include <chrono>
 #include <thread>
 
