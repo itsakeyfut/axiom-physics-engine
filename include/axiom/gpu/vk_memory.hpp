@@ -146,6 +146,10 @@ public:
     /// @return VMA allocator handle (opaque)
     void* getAllocator() const noexcept { return allocator_; }
 
+    /// Get the Vulkan context
+    /// @return VkContext pointer
+    VkContext* getContext() const noexcept { return context_; }
+
 private:
     /// Private constructor - use create() instead
     explicit VkMemoryManager(VkContext* context);
