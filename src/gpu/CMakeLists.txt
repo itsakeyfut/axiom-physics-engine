@@ -9,6 +9,7 @@ set(GPU_SOURCES
     vk_swapchain.cpp
     vk_shader.cpp
     vk_descriptor.cpp
+    vk_compute_pipeline.cpp
 )
 
 # Header files (for IDE integration)
@@ -20,6 +21,7 @@ set(GPU_HEADERS
     ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_swapchain.hpp
     ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_shader.hpp
     ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_descriptor.hpp
+    ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_compute_pipeline.hpp
 )
 
 # Create library target
