@@ -272,7 +272,7 @@ jobs:
           FILES=$(find src include tests benchmarks examples -name "*.cpp" -o -name "*.hpp" -o -name "*.h" 2>/dev/null || true)
           if [ -n "$FILES" ]; then
             echo "$FILES" | xargs clang-format --dry-run -Werror || \
-            (echo "Code formatting issues found. Run 'make format' to fix." && exit 1)
+            (echo "Code formatting issues found. Run 'just format' to fix." && exit 1)
           else
             echo "No C++ source files found yet - skipping format check"
           fi

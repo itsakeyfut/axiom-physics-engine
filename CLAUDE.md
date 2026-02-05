@@ -8,6 +8,42 @@ Axiom Physics Engine - A next-generation realistic physics engine built with C++
 
 ## Build Commands
 
+### Using just (Recommended)
+
+```bash
+# Show all available commands
+just --list
+
+# Debug build
+just build-debug
+
+# Release build
+just build-release
+
+# Compile shaders
+just compile-shaders
+
+# Full build (shaders + build)
+just full-build
+
+# Run tests
+just test
+
+# Run specific test by filter
+just test-filter "GJKTest.*"
+
+# Format code
+just format
+
+# Run linter
+just lint
+
+# Clean build artifacts
+just clean
+```
+
+### Using CMake directly
+
 ```bash
 # Set vcpkg environment variable (first time only)
 set VCPKG_ROOT=C:\path\to\vcpkg
@@ -28,13 +64,19 @@ cmake --build build/windows-relwithdebinfo
 ## Test Commands
 
 ```bash
-# Run all tests
+# Using just
+just test
+just test-verbose
+just test-filter "GJKTest.*"
+
+# Using ctest directly
 ctest --preset windows-debug
 
 # Run specific test (Google Test)
 ./build/windows-debug/bin/axiom_tests --gtest_filter="GJKTest.*"
 
 # Run benchmarks
+just benchmark
 ./build/windows-release/bin/axiom_benchmark
 ```
 

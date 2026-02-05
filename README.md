@@ -23,7 +23,8 @@ Axiom is a high-performance physics engine targeting 120 FPS (8.33ms/frame) that
 - C++20 compatible compiler (MSVC 2022, GCC 11+, Clang 13+)
 - CMake 3.24+
 - vcpkg (for dependency management)
-- Vulkan SDK 1.3+ (optional, for future GPU features)
+- Vulkan SDK 1.3+ (for GPU compute features)
+- [just](https://github.com/casey/just) (command runner, optional but recommended)
 
 ## Dependencies
 
@@ -151,31 +152,44 @@ cmake --preset macos-release
 cmake --build build/macos-release
 ```
 
-### Using the Makefile
+### Using just (Recommended)
 
-For convenience, a Makefile is provided with common commands:
+For convenience, a `justfile` is provided with common commands:
 
 ```bash
+# Install just
+# Windows
+winget install --id Casey.Just
+
+# macOS
+brew install just
+
+# Linux
+cargo install just
+
 # Show available commands
-make help
+just --list
 
 # Configure and build
-make build
-
-# Build only (after configuration)
-make compile
+just build
 
 # Run tests
-make test
+just test
 
 # Format code
-make format
+just format
 
 # Run linter
-make lint
+just lint
 
 # Clean build artifacts
-make clean
+just clean
+
+# Compile shaders
+just compile-shaders
+
+# Full build (shaders + project)
+just full-build
 ```
 
 ## Testing
@@ -214,10 +228,10 @@ After building the project, you can run the Axiom Physics Engine demo applicatio
 # Run release build
 ./build/windows-release/bin/Release/axiom_app.exe
 
-# Using Makefile
-make run         # Run debug build
-make run-release # Run release build
-make app         # Alias for 'make run'
+# Using just
+just run         # Run debug build
+just run-release # Run release build
+just app         # Alias for 'just run'
 ```
 
 #### Linux
@@ -229,10 +243,10 @@ make app         # Alias for 'make run'
 # Run release build
 ./build/linux-release/bin/axiom_app
 
-# Using Makefile
-make run         # Run debug build
-make run-release # Run release build
-make app         # Alias for 'make run'
+# Using just
+just run         # Run debug build
+just run-release # Run release build
+just app         # Alias for 'just run'
 ```
 
 #### macOS
@@ -244,10 +258,10 @@ make app         # Alias for 'make run'
 # Run release build
 ./build/macos-release/bin/axiom_app
 
-# Using Makefile
-make run         # Run debug build
-make run-release # Run release build
-make app         # Alias for 'make run'
+# Using just
+just run         # Run debug build
+just run-release # Run release build
+just app         # Alias for 'just run'
 ```
 
 The demo application demonstrates:
