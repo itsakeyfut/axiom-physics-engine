@@ -1,4 +1,4 @@
-// Simple compute shader for testing shader module loading (Slang/HLSL)
+// Simple compute shader for testing shader module loading (Slang)
 // This shader adds two arrays element-wise
 
 // Input buffers

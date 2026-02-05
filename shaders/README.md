@@ -17,33 +17,24 @@ We use **Slang** as our primary shader language. Slang is a superset of HLSL tha
 
 ## Compilation
 
-Shaders must be compiled to SPIR-V format before use. Use `slangc` from the Vulkan SDK:
+Shaders must be compiled to SPIR-V format before use. Use `slangc`:
 
 ```bash
-# Compile compute shader
-slangc -target spirv -stage compute shader.comp -o shader.comp.spv
+# Compile Slang shader (entry point specified in code)
+slangc -target spirv -entry main shader.slang -o shader.spv
 
-# Compile vertex shader
-slangc -target spirv -stage vertex shader.vert -o shader.vert.spv
-
-# Compile fragment shader
-slangc -target spirv -stage fragment shader.frag -o shader.frag.spv
+# Or specify stage explicitly if needed
+slangc -target spirv -stage compute -entry main shader.slang -o shader.spv
 ```
 
-### Alternative: GLSL Support
-
-While we primarily use Slang, GLSL shaders can also be compiled using `glslc`:
-
-```bash
-glslc -fshader-stage=compute shader.comp -o shader.comp.spv
-```
+**Note:** Slang uses the `.slang` extension regardless of shader stage (compute, vertex, fragment, etc.). The shader stage is determined by the entry point attributes in the code (e.g., `[shader("compute")]` or `[numthreads(...)]`).
 
 ## Test Shaders
 
-### simple.comp
-A simple compute shader (Slang/HLSL) that adds two arrays element-wise. Used for testing shader module loading and basic compute pipeline functionality.
+### simple.slang
+A simple compute shader that adds two arrays element-wise. Used for testing shader module loading and basic compute pipeline functionality.
 
-**Language:** Slang/HLSL
+**Language:** Slang
 
 **Bindings:**
 - Binding 0, Set 0: Input buffer A (StructuredBuffer<float>)
