@@ -11,6 +11,7 @@ set(GPU_SOURCES
     vk_descriptor.cpp
     vk_compute_pipeline.cpp
     vk_graphics_pipeline.cpp
+    render_pass.cpp
     gpu_buffer.cpp
 )
 
@@ -25,6 +26,7 @@ set(GPU_HEADERS
     ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_descriptor.hpp
     ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_compute_pipeline.hpp
     ${PROJECT_SOURCE_DIR}/include/axiom/gpu/vk_graphics_pipeline.hpp
+    ${PROJECT_SOURCE_DIR}/include/axiom/gpu/render_pass.hpp
     ${PROJECT_SOURCE_DIR}/include/axiom/gpu/gpu_buffer.hpp
 )
 
