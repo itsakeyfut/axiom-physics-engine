@@ -1,5 +1,45 @@
 # Axiom test suite
 
+# Find glslc for shader compilation
+find_program(GLSLC glslc HINTS "$ENV{VULKAN_SDK}/Bin")
+if(NOT GLSLC)
+    message(WARNING "glslc not found. Shader compilation will be skipped. Install Vulkan SDK to enable shader tests.")
+endif()
+
+# Function to compile GLSL shaders to SPIR-V
+function(add_shader_compilation TARGET SHADER_SOURCE)
+    if(GLSLC)
+        get_filename_component(SHADER_NAME ${SHADER_SOURCE} NAME)
+        set(SHADER_INPUT ${CMAKE_SOURCE_DIR}/shaders/${SHADER_SOURCE})
+        set(SHADER_OUTPUT ${CMAKE_BINARY_DIR}/shaders/${SHADER_SOURCE}.spv)
+
+        # Create output directory
+        get_filename_component(SHADER_OUTPUT_DIR ${SHADER_OUTPUT} DIRECTORY)
+        file(MAKE_DIRECTORY ${SHADER_OUTPUT_DIR})
+
+        # Add custom command to compile shader
+        add_custom_command(
+            OUTPUT ${SHADER_OUTPUT}
+            COMMAND ${GLSLC} ${SHADER_INPUT} -o ${SHADER_OUTPUT}
+            DEPENDS ${SHADER_INPUT}
+            COMMENT "Compiling shader ${SHADER_SOURCE}"
+            VERBATIM
+        )
+
+        # Add shader output to target dependencies
+        target_sources(${TARGET} PRIVATE ${SHADER_OUTPUT})
+
+        # Copy to build directory for tests
+        add_custom_command(
+            TARGET ${TARGET} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${SHADER_OUTPUT}
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders/${SHADER_SOURCE}.spv
+            COMMENT "Copying ${SHADER_NAME}.spv to runtime directory"
+        )
+    endif()
+endfunction()
+
 # Test executable
 add_executable(axiom_tests
     core/error_code_test.cpp
@@ -31,6 +71,7 @@ add_executable(axiom_tests
     gpu/vk_descriptor_test.cpp
     gpu/vk_compute_pipeline_test.cpp
     gpu/gpu_buffer_test.cpp
+    gpu/test_compute.cpp
     frontend/window_test.cpp
 )
 
@@ -53,5 +94,8 @@ add_test(NAME axiom_tests COMMAND axiom_tests)
 set_target_properties(axiom_tests PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
+
+# Compile test shaders
+add_shader_compilation(axiom_tests test/array_add.comp)
 
 message(STATUS "Axiom tests configured")

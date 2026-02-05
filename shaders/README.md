@@ -51,3 +51,23 @@ A simple compute shader (Slang/HLSL) that adds two arrays element-wise. Used for
 - Binding 2, Set 0: Output buffer (RWStructuredBuffer<float>)
 
 **Workgroup size:** 256 threads per group
+
+### array_add.comp
+Array addition compute shader (GLSL) for comprehensive compute pipeline testing. Verifies GPU compute infrastructure by performing element-wise addition with CPU result validation.
+
+**Language:** GLSL
+
+**Bindings:**
+- Binding 0: Input buffer A (readonly storage buffer)
+- Binding 1: Input buffer B (readonly storage buffer)
+- Binding 2: Output buffer (writeonly storage buffer)
+
+**Push constants:**
+- uint count: Number of elements to process
+
+**Workgroup size:** 256 threads per group
+
+**Features:**
+- Bounds checking to handle non-aligned buffer sizes
+- Push constant for dynamic element count
+- Used by test_compute.cpp for integration testing

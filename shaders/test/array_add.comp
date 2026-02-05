@@ -1,0 +1,35 @@
+#version 450
+
+// Compute shader for array addition test
+// This shader performs element-wise addition of two float arrays
+// Used to verify that the Vulkan compute infrastructure works correctly
+
+layout(local_size_x = 256) in;
+
+// Input buffers (read-only)
+layout(binding = 0) readonly buffer InputA {
+    float a[];
+};
+
+layout(binding = 1) readonly buffer InputB {
+    float b[];
+};
+
+// Output buffer (write-only)
+layout(binding = 2) writeonly buffer Output {
+    float result[];
+};
+
+// Push constants for element count
+layout(push_constant) uniform PushConstants {
+    uint count;
+} pc;
+
+void main() {
+    uint idx = gl_GlobalInvocationID.x;
+
+    // Bounds check to avoid out-of-range writes
+    if (idx < pc.count) {
+        result[idx] = a[idx] + b[idx];
+    }
+}
