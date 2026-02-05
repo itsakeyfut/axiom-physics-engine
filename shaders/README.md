@@ -42,3 +42,35 @@ A simple compute shader that adds two arrays element-wise. Used for testing shad
 - Binding 2, Set 0: Output buffer (RWStructuredBuffer<float>)
 
 **Workgroup size:** 256 threads per group
+
+### array_add.slang
+Comprehensive compute shader for array addition with bounds checking. Performs element-wise addition: `output[i] = inputA[i] + inputB[i]`. This shader is used for integration testing of the complete Vulkan compute pipeline infrastructure.
+
+**Language:** Slang
+
+**Bindings:**
+- Binding 0, Set 0: Input buffer A (StructuredBuffer<float>, read-only)
+- Binding 1, Set 0: Input buffer B (StructuredBuffer<float>, read-only)
+- Binding 2, Set 0: Output buffer (RWStructuredBuffer<float>, write-only)
+
+**Push Constants:**
+- `count` (uint32_t): Number of elements to process (for bounds checking)
+
+**Workgroup size:** 256 threads per group (1D)
+
+**Compilation:**
+```bash
+# Compile array_add.slang to SPIR-V
+slangc -target spirv -entry main shaders/test/array_add.slang -o shaders/test/array_add.comp.spv
+
+# Verify compilation
+spirv-val shaders/test/array_add.comp.spv  # Optional: validate SPIR-V output
+```
+
+**Usage in tests:**
+This shader is used by `tests/gpu/test_compute.cpp` to verify:
+- GPU buffer upload/download functionality
+- Descriptor set binding and updates
+- Push constant handling
+- Compute shader dispatch with various array sizes
+- Floating point precision on GPU vs CPU calculations
