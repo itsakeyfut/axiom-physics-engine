@@ -6,6 +6,7 @@
 #include "axiom/gpu/vk_instance.hpp"
 #include "axiom/gpu/vk_shader.hpp"
 
+#include <cstring>
 #include <fstream>
 
 namespace axiom::gpu {
@@ -276,7 +277,8 @@ core::Result<void> PipelineCache::save(const std::string& path) {
                                            "Failed to open file for writing");
     }
 
-    file.write(reinterpret_cast<const char*>(cacheData.data()), dataSize);
+    file.write(reinterpret_cast<const char*>(cacheData.data()),
+               static_cast<std::streamsize>(dataSize));
     file.close();
 
     AXIOM_LOG_INFO("PipelineCache", "Pipeline cache saved to %s (%zu bytes)", path.c_str(),
@@ -304,7 +306,7 @@ core::Result<void> PipelineCache::load(const std::string& path) {
     }
 
     // Read file data
-    std::vector<uint8_t> cacheData(fileSize);
+    std::vector<uint8_t> cacheData(static_cast<size_t>(fileSize));
     if (!file.read(reinterpret_cast<char*>(cacheData.data()), fileSize)) {
         AXIOM_LOG_ERROR("PipelineCache", "Failed to read pipeline cache file: %s", path.c_str());
         return core::Result<void>::failure(core::ErrorCode::InvalidParameter,
