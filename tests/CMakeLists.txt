@@ -30,6 +30,7 @@ add_executable(axiom_tests
     gpu/vk_shader_test.cpp
     gpu/vk_descriptor_test.cpp
     gpu/vk_compute_pipeline_test.cpp
+    gpu/gpu_buffer_test.cpp
     frontend/window_test.cpp
 )
 
