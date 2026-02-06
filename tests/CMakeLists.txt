@@ -35,6 +35,7 @@ add_executable(axiom_tests
     gpu/framebuffer_test.cpp
     gpu/gpu_buffer_test.cpp
     gpu/test_compute.cpp
+    debug/debug_draw_test.cpp
     frontend/window_test.cpp
 )
 
@@ -45,6 +46,7 @@ target_link_libraries(axiom_tests
         axiom::core
         axiom::memory
         axiom::gpu
+        axiom::debug
         axiom::frontend
         GTest::gtest
         GTest::gtest_main
