@@ -39,6 +39,7 @@ add_executable(axiom_tests
     debug/physics_debug_draw_test.cpp
     frontend/window_test.cpp
     gui/imgui_renderer_test.cpp
+    gui/physics_panel_test.cpp
 )
 
 # Link libraries

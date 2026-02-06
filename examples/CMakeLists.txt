@@ -47,4 +47,23 @@ set_target_properties(command_buffer_example PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
-message(STATUS "Examples configured: profiling_example, vk_test, command_buffer_example")
+# Physics panel example - demonstrates physics debug panel with ImGui
+add_executable(physics_panel_example
+    physics_panel_example.cpp
+)
+
+target_link_libraries(physics_panel_example
+    PRIVATE
+        axiom::core
+        axiom::gui
+        axiom::debug
+        axiom::frontend
+        axiom::gpu
+        glfw
+)
+
+set_target_properties(physics_panel_example PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
+message(STATUS "Examples configured: profiling_example, vk_test, command_buffer_example, physics_panel_example")
