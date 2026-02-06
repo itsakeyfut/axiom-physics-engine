@@ -36,6 +36,7 @@ add_executable(axiom_tests
     gpu/gpu_buffer_test.cpp
     gpu/test_compute.cpp
     debug/debug_draw_test.cpp
+    debug/physics_debug_draw_test.cpp
     frontend/window_test.cpp
 )
 
