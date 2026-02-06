@@ -59,6 +59,9 @@ Testing/
 *.swp
 *~
 
+# ImGui temporary files
+imgui.ini
+
 # Claude Code
 .claude/settings.local.json
 .claude/commands/
