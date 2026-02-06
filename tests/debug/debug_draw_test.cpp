@@ -311,6 +311,130 @@ TEST_F(DebugDrawTest, DrawComplexScene) {
     EXPECT_GT(debugDraw_->getVertexCount(), 100);
 }
 
+// Test enhanced sphere with separate lat/lon segments
+TEST_F(DebugDrawTest, DrawSphereWithLatLon) {
+    ASSERT_NE(memManager_, nullptr);
+    debugDraw_ = std::make_unique<DebugDraw>(context_.get(), memManager_.get());
+
+    debugDraw_->clear();
+
+    // Draw sphere with different lat/lon segment counts
+    debugDraw_->drawSphere(Vec3(0, 0, 0), 1.0f, Vec4(1, 0, 0, 1), 8, 16);
+
+    // Should generate vertices (8 meridians * 8 segments each + 7 latitude circles * 16 segments)
+    EXPECT_GT(debugDraw_->getVertexCount(), 0);
+
+    // Verify we can draw multiple with different tessellations
+    debugDraw_->drawSphere(Vec3(3, 0, 0), 1.0f, Vec4(0, 1, 0, 1), 16, 8);
+    debugDraw_->drawSphere(Vec3(6, 0, 0), 1.0f, Vec4(0, 0, 1, 1), 32, 32);
+
+    EXPECT_GT(debugDraw_->getVertexCount(), 200);
+}
+
+// Test enhanced capsule with separate segments and rings
+TEST_F(DebugDrawTest, DrawCapsuleWithRings) {
+    ASSERT_NE(memManager_, nullptr);
+    debugDraw_ = std::make_unique<DebugDraw>(context_.get(), memManager_.get());
+
+    debugDraw_->clear();
+
+    // Draw capsule with specific ring count
+    debugDraw_->drawCapsule(Vec3(0, 0, 0), Vec3(0, 2, 0), 0.5f, Vec4(0, 1, 0, 1), 12, 6);
+
+    EXPECT_GT(debugDraw_->getVertexCount(), 0);
+
+    // Test different configurations
+    debugDraw_->clear();
+    debugDraw_->drawCapsule(Vec3(0, 0, 0), Vec3(2, 0, 0), 0.3f, Vec4(1, 0, 1, 1), 8, 4);
+    EXPECT_GT(debugDraw_->getVertexCount(), 50);
+}
+
+// Test convex hull drawing
+TEST_F(DebugDrawTest, DrawConvexHull) {
+    ASSERT_NE(memManager_, nullptr);
+    debugDraw_ = std::make_unique<DebugDraw>(context_.get(), memManager_.get());
+
+    debugDraw_->clear();
+
+    // Create a simple tetrahedron
+    std::vector<Vec3> vertices = {
+        Vec3(0, 1, 0),    // Top
+        Vec3(-1, 0, -1),  // Bottom front-left
+        Vec3(1, 0, -1),   // Bottom front-right
+        Vec3(0, 0, 1)     // Bottom back
+    };
+
+    std::vector<uint32_t> indices = {
+        0, 1, 2,  // Top triangle (front face)
+        0, 2, 3,  // Top triangle (right face)
+        0, 3, 1,  // Top triangle (left face)
+        1, 3, 2   // Bottom triangle
+    };
+
+    debugDraw_->drawConvexHull(vertices, indices, Vec4(1, 1, 0, 1));
+
+    // A tetrahedron has 6 edges
+    EXPECT_EQ(debugDraw_->getVertexCount(), 12);  // 6 edges * 2 vertices per edge
+}
+
+// Test convex hull with transformation
+TEST_F(DebugDrawTest, DrawConvexHullTransformed) {
+    ASSERT_NE(memManager_, nullptr);
+    debugDraw_ = std::make_unique<DebugDraw>(context_.get(), memManager_.get());
+
+    debugDraw_->clear();
+
+    // Create a simple cube
+    std::vector<Vec3> vertices = {Vec3(-0.5f, -0.5f, -0.5f), Vec3(0.5f, -0.5f, -0.5f),
+                                  Vec3(0.5f, 0.5f, -0.5f),   Vec3(-0.5f, 0.5f, -0.5f),
+                                  Vec3(-0.5f, -0.5f, 0.5f),  Vec3(0.5f, -0.5f, 0.5f),
+                                  Vec3(0.5f, 0.5f, 0.5f),    Vec3(-0.5f, 0.5f, 0.5f)};
+
+    // Cube faces (12 triangles, 2 per face)
+    std::vector<uint32_t> indices = {
+        0, 1, 2, 0, 2, 3,  // Front
+        1, 5, 6, 1, 6, 2,  // Right
+        5, 4, 7, 5, 7, 6,  // Back
+        4, 0, 3, 4, 3, 7,  // Left
+        3, 2, 6, 3, 6, 7,  // Top
+        4, 5, 1, 4, 1, 0   // Bottom
+    };
+
+    Transform transform(Vec3(2, 3, 4), Quat(), Vec3(2, 2, 2));
+    debugDraw_->drawConvexHull(vertices, indices, transform, Vec4(0, 1, 1, 1));
+
+    // A cube has 12 unique edges, but some edges may be shared by triangles
+    // The actual vertex count depends on the edge extraction algorithm
+    EXPECT_GT(debugDraw_->getVertexCount(), 0);   // Just verify edges were drawn
+    EXPECT_LE(debugDraw_->getVertexCount(), 72);  // Max: 12 triangles * 3 edges * 2 verts
+}
+
+// Test convex hull with empty or invalid data
+TEST_F(DebugDrawTest, DrawConvexHullInvalid) {
+    ASSERT_NE(memManager_, nullptr);
+    debugDraw_ = std::make_unique<DebugDraw>(context_.get(), memManager_.get());
+
+    debugDraw_->clear();
+
+    // Empty vertices
+    std::vector<Vec3> emptyVertices;
+    std::vector<uint32_t> indices = {0, 1, 2};
+    debugDraw_->drawConvexHull(emptyVertices, indices, Vec4(1, 0, 0, 1));
+    EXPECT_EQ(debugDraw_->getVertexCount(), 0);
+
+    // Empty indices
+    std::vector<Vec3> vertices = {Vec3(0, 0, 0), Vec3(1, 0, 0), Vec3(0, 1, 0)};
+    std::vector<uint32_t> emptyIndices;
+    debugDraw_->drawConvexHull(vertices, emptyIndices, Vec4(1, 0, 0, 1));
+    EXPECT_EQ(debugDraw_->getVertexCount(), 0);
+
+    // Invalid indices
+    debugDraw_->clear();
+    std::vector<uint32_t> invalidIndices = {0, 1, 100};  // Index 100 out of bounds
+    debugDraw_->drawConvexHull(vertices, invalidIndices, Vec4(1, 0, 0, 1));
+    // Should handle gracefully without crashing
+}
+
 // Note: Actual rendering tests (flush with command buffer) would require
 // a full rendering setup with swapchain, render pass, etc. Those tests
 // are better suited for integration tests or visual debugging tools.
