@@ -20,7 +20,7 @@ void RenderPass::begin(VkCommandBuffer cmd, const RenderPassInfo& info) noexcept
 
         // MSAA resolve
         if (attachment.resolveImageView != VK_NULL_HANDLE) {
-            attachmentInfo.resolveMode = VK_RESOLVE_MODE_AVERAGE_BIT;
+            attachmentInfo.resolveMode = attachment.resolveMode;
             attachmentInfo.resolveImageView = attachment.resolveImageView;
             attachmentInfo.resolveImageLayout = attachment.resolveLayout;
         } else {
@@ -45,7 +45,7 @@ void RenderPass::begin(VkCommandBuffer cmd, const RenderPassInfo& info) noexcept
 
         // MSAA resolve
         if (attachment.resolveImageView != VK_NULL_HANDLE) {
-            depthAttachmentInfo.resolveMode = VK_RESOLVE_MODE_AVERAGE_BIT;
+            depthAttachmentInfo.resolveMode = attachment.resolveMode;
             depthAttachmentInfo.resolveImageView = attachment.resolveImageView;
             depthAttachmentInfo.resolveImageLayout = attachment.resolveLayout;
         } else {
@@ -70,7 +70,7 @@ void RenderPass::begin(VkCommandBuffer cmd, const RenderPassInfo& info) noexcept
 
         // MSAA resolve
         if (attachment.resolveImageView != VK_NULL_HANDLE) {
-            stencilAttachmentInfo.resolveMode = VK_RESOLVE_MODE_AVERAGE_BIT;
+            stencilAttachmentInfo.resolveMode = attachment.resolveMode;
             stencilAttachmentInfo.resolveImageView = attachment.resolveImageView;
             stencilAttachmentInfo.resolveImageLayout = attachment.resolveLayout;
         } else {

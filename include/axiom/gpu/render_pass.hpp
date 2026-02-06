@@ -12,6 +12,11 @@ namespace axiom::gpu {
 /// Attachment information for dynamic rendering
 /// Describes a single color, depth, or stencil attachment including its image view,
 /// layout, load/store operations, clear value, and optional MSAA resolve target.
+///
+/// @note When using MSAA resolve with stencil attachments, resolveMode must be set to
+/// VK_RESOLVE_MODE_SAMPLE_ZERO_BIT or another stencil-compatible mode. The default
+/// VK_RESOLVE_MODE_AVERAGE_BIT is only valid for color and depth attachments (if supported
+/// by the device for depth).
 struct AttachmentInfo {
     VkImageView imageView = VK_NULL_HANDLE;  ///< Image view to render to
     VkImageLayout layout =
@@ -23,6 +28,9 @@ struct AttachmentInfo {
     VkClearValue clearValue = {};      ///< Clear value (color or depth/stencil)
 
     // For MSAA resolve
+    VkResolveModeFlagBits resolveMode =
+        VK_RESOLVE_MODE_AVERAGE_BIT;  ///< Resolve mode (AVERAGE for color/depth, SAMPLE_ZERO
+                                      ///< for stencil)
     VkImageView resolveImageView = VK_NULL_HANDLE;  ///< Resolve target for MSAA (optional)
     VkImageLayout resolveLayout =
         VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;  ///< Resolve target layout
