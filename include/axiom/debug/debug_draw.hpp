@@ -30,8 +30,10 @@ namespace debug {
 
 /// Configuration for debug draw system
 struct DebugDrawConfig {
-    size_t initialVertexCapacity = 10000;  ///< Initial capacity for vertex buffer
-    bool depthTestEnabled = true;          ///< Default depth test state
+    size_t initialVertexCapacity = 10000;                 ///< Initial capacity for vertex buffer
+    bool depthTestEnabled = true;                         ///< Default depth test state
+    VkFormat colorFormat = VK_FORMAT_B8G8R8A8_SRGB;       ///< Color attachment format (default: sRGB)
+    VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;          ///< Depth attachment format (default: D32)
 };
 
 /// Debug rendering system for visualizing physics primitives

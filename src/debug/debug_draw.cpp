@@ -226,23 +226,23 @@ void DebugDraw::drawCapsule(const Vec3& start, const Vec3& end, float radius, co
             float y1 = radius * std::sin(theta);
             float y2 = radius * std::sin(nextTheta);
 
-            // Start hemisphere
-            Vec3 p1 = start + dir * y1 + (right * std::cos(angle) + forward * std::sin(angle)) * r1;
-            Vec3 p2 = start + dir * y2 + (right * std::cos(angle) + forward * std::sin(angle)) * r2;
+            // Start hemisphere (extends away from cylinder toward start)
+            Vec3 p1 = start - dir * y1 + (right * std::cos(angle) + forward * std::sin(angle)) * r1;
+            Vec3 p2 = start - dir * y2 + (right * std::cos(angle) + forward * std::sin(angle)) * r2;
             addLine(p1, p2, color);
 
-            // End hemisphere
-            Vec3 p3 = end - dir * y1 + (right * std::cos(angle) + forward * std::sin(angle)) * r1;
-            Vec3 p4 = end - dir * y2 + (right * std::cos(angle) + forward * std::sin(angle)) * r2;
+            // End hemisphere (extends away from cylinder toward end)
+            Vec3 p3 = end + dir * y1 + (right * std::cos(angle) + forward * std::sin(angle)) * r1;
+            Vec3 p4 = end + dir * y2 + (right * std::cos(angle) + forward * std::sin(angle)) * r2;
             addLine(p3, p4, color);
 
             // Draw latitude lines on start cap
-            Vec3 p5 = start + dir * y1 +
+            Vec3 p5 = start - dir * y1 +
                       (right * std::cos(nextAngle) + forward * std::sin(nextAngle)) * r1;
             addLine(p1, p5, color);
 
             // Draw latitude lines on end cap
-            Vec3 p6 = end - dir * y1 +
+            Vec3 p6 = end + dir * y1 +
                       (right * std::cos(nextAngle) + forward * std::sin(nextAngle)) * r1;
             addLine(p3, p6, color);
         }
@@ -493,10 +493,10 @@ core::Result<void> DebugDraw::initPipelines() {
     pushConstant.size = sizeof(Mat4);
     pushConstant.stages = VK_SHADER_STAGE_VERTEX_BIT;
 
-    // Rendering formats (common formats for debug rendering)
+    // Rendering formats (from configuration)
     GraphicsPipelineBuilder::RenderingFormats formats{};
-    formats.colorFormats = {VK_FORMAT_R8G8B8A8_UNORM};  // Standard RGBA format
-    formats.depthFormat = VK_FORMAT_D32_SFLOAT;         // Standard depth format
+    formats.colorFormats = {config_.colorFormat};  // Use configured color format
+    formats.depthFormat = config_.depthFormat;     // Use configured depth format
 
     // Create pipeline WITH depth testing
     {
