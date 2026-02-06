@@ -72,8 +72,11 @@ vcpkg-update:
 # Compile all test shaders to SPIR-V
 compile-shaders:
     @echo "Compiling test shaders..."
-    slangc -target spirv -entry main shaders/test/simple.slang -o shaders/test/simple.comp.spv
-    slangc -target spirv -entry main shaders/test/array_add.slang -o shaders/test/array_add.comp.spv
+    slangc -target spirv -stage compute -entry main shaders/test/simple.slang -o shaders/test/simple.comp.spv
+    slangc -target spirv -stage compute -entry main shaders/test/array_add.slang -o shaders/test/array_add.comp.spv
+    @echo "Compiling debug shaders..."
+    slangc -target spirv -stage vertex -entry vertexMain shaders/debug/line.slang -o shaders/debug/line.vert.spv
+    slangc -target spirv -stage fragment -entry fragmentMain shaders/debug/line.slang -o shaders/debug/line.frag.spv
     @echo "Shader compilation complete!"
 
 # Compile specific shader
