@@ -102,6 +102,7 @@ core::Result<void> Framebuffer::createColorAttachment() {
     VkResult vkResult = vkCreateImageView(context_->getDevice(), &viewInfo, nullptr, &colorView_);
     if (vkResult != VK_SUCCESS) {
         memManager_->destroyImage(colorImage_);
+        colorImage_ = {};
         return core::Result<void>::failure(core::ErrorCode::GPU_OPERATION_FAILED,
                                            "Failed to create color image view");
     }
@@ -151,6 +152,7 @@ core::Result<void> Framebuffer::createDepthAttachment() {
     VkResult vkResult = vkCreateImageView(context_->getDevice(), &viewInfo, nullptr, &depthView_);
     if (vkResult != VK_SUCCESS) {
         memManager_->destroyImage(depthImage_);
+        depthImage_ = {};
         return core::Result<void>::failure(core::ErrorCode::GPU_OPERATION_FAILED,
                                            "Failed to create depth image view");
     }
@@ -411,6 +413,7 @@ core::Result<void> SwapchainFramebuffer::createDepthBuffer() {
     VkResult vkResult = vkCreateImageView(context_->getDevice(), &viewInfo, nullptr, &depthView_);
     if (vkResult != VK_SUCCESS) {
         memManager_->destroyImage(depthImage_);
+        depthImage_ = {};
         return core::Result<void>::failure(core::ErrorCode::GPU_OPERATION_FAILED,
                                            "Failed to create swapchain depth image view");
     }
@@ -438,16 +441,11 @@ VkImageView SwapchainFramebuffer::getColorView(uint32_t imageIndex) const {
     return swapchain_->getImageView(imageIndex);
 }
 
-core::Result<void> SwapchainFramebuffer::resize(VkExtent2D newExtent) {
-    if (newExtent.width == 0 || newExtent.height == 0) {
-        return core::Result<void>::failure(core::ErrorCode::InvalidParameter,
-                                           "Invalid extent for resize");
-    }
-
+core::Result<void> SwapchainFramebuffer::resize() {
     // Clean up old depth buffer
     cleanup();
 
-    // Recreate depth buffer with new extent
+    // Recreate depth buffer with current swapchain extent
     return createDepthBuffer();
 }
 

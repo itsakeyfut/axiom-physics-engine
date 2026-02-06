@@ -166,11 +166,11 @@ private:
     Config config_;                ///< Framebuffer configuration
     VkExtent2D extent_;            ///< Current framebuffer dimensions
 
-    VkMemoryManager::Image colorImage_;                      ///< Color attachment image
+    VkMemoryManager::Image colorImage_{};                    ///< Color attachment image
     VkImageView colorView_ = VK_NULL_HANDLE;                 ///< Color attachment image view
     VkImageLayout colorLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;  ///< Current color layout
 
-    VkMemoryManager::Image depthImage_;                      ///< Depth attachment image
+    VkMemoryManager::Image depthImage_{};                    ///< Depth attachment image
     VkImageView depthView_ = VK_NULL_HANDLE;                 ///< Depth attachment image view
     VkImageLayout depthLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;  ///< Current depth layout
 };
@@ -187,8 +187,8 @@ private:
 /// while (!glfwWindowShouldClose(window)) {
 ///     auto acquireResult = swapchain.acquireNextImage(imageAvailable.get());
 ///     if (acquireResult.needsResize) {
-///         // Handle resize
-///         swapchainFB.resize(newExtent);
+///         // Handle resize (uses current swapchain extent)
+///         swapchainFB.resize();
 ///         continue;
 ///     }
 ///
@@ -243,10 +243,10 @@ public:
     /// @return Current depth image layout
     VkImageLayout getDepthLayout() const noexcept { return depthLayout_; }
 
-    /// Resize the depth buffer to match new swapchain extent
-    /// @param newExtent New framebuffer dimensions
+    /// Resize the depth buffer to match current swapchain extent
+    /// The extent is automatically determined from the swapchain
     /// @return Result indicating success or failure
-    core::Result<void> resize(VkExtent2D newExtent);
+    core::Result<void> resize();
 
     /// Transition depth attachment to a new layout
     /// @param cmd Command buffer to record the barrier
@@ -272,7 +272,7 @@ private:
     VkMemoryManager* memManager_;  ///< Memory manager (not owned)
     Swapchain* swapchain_;         ///< Swapchain (not owned)
 
-    VkMemoryManager::Image depthImage_;                      ///< Depth attachment image
+    VkMemoryManager::Image depthImage_{};                    ///< Depth attachment image
     VkImageView depthView_ = VK_NULL_HANDLE;                 ///< Depth attachment image view
     VkImageLayout depthLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;  ///< Current depth layout
 };
