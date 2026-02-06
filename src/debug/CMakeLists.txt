@@ -2,6 +2,7 @@
 
 add_library(axiom_debug STATIC
     debug_draw.cpp
+    physics_debug_draw.cpp
 )
 
 # Create alias for consistent naming
