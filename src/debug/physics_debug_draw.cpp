@@ -299,9 +299,9 @@ math::Vec4 PhysicsDebugDraw::getIslandColor(uint32_t islandIndex) const noexcept
     const uint32_t hash = islandIndex * 2654435761u;  // Golden ratio prime
 
     // Extract RGB components from hash
-    float r = ((hash >> 0) & 0xFF) / 255.0f;
-    float g = ((hash >> 8) & 0xFF) / 255.0f;
-    float b = ((hash >> 16) & 0xFF) / 255.0f;
+    float r = static_cast<float>((hash >> 0) & 0xFF) / 255.0f;
+    float g = static_cast<float>((hash >> 8) & 0xFF) / 255.0f;
+    float b = static_cast<float>((hash >> 16) & 0xFF) / 255.0f;
 
     // Ensure minimum brightness for visibility
     const float minBrightness = 0.3f;
