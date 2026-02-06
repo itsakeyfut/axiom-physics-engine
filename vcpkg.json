@@ -31,28 +31,25 @@
     {
       "name": "glfw3",
       "version>=": "3.4"
+    },
+    {
+      "name": "imgui",
+      "version>=": "1.90",
+      "features": ["glfw-binding", "vulkan-binding"]
     }
   ],
   "features": {
     "tracy": {
       "description": "Tracy profiler support for performance analysis",
-      "dependencies": [
-        "tracy"
-      ]
+      "dependencies": ["tracy"]
     },
     "vulkan": {
       "description": "Vulkan GPU compute support (future phase)",
-      "dependencies": [
-        "vulkan",
-        "vulkan-memory-allocator"
-      ]
+      "dependencies": ["vulkan", "vulkan-memory-allocator"]
     },
     "rendering": {
       "description": "Rendering support for visualization (future phase)",
-      "dependencies": [
-        "glfw3",
-        "imgui"
-      ]
+      "dependencies": ["glfw3", "imgui"]
     }
   },
   "builtin-baseline": "40c89449f0ccce12d21f8a906639f6c2c649b9e7"

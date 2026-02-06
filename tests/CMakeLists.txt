@@ -38,6 +38,7 @@ add_executable(axiom_tests
     debug/debug_draw_test.cpp
     debug/physics_debug_draw_test.cpp
     frontend/window_test.cpp
+    gui/imgui_renderer_test.cpp
 )
 
 # Link libraries
@@ -49,6 +50,7 @@ target_link_libraries(axiom_tests
         axiom::gpu
         axiom::debug
         axiom::frontend
+        axiom::gui
         GTest::gtest
         GTest::gtest_main
 )
