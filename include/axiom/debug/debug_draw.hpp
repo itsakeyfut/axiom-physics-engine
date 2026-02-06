@@ -30,10 +30,10 @@ namespace debug {
 
 /// Configuration for debug draw system
 struct DebugDrawConfig {
-    size_t initialVertexCapacity = 10000;                 ///< Initial capacity for vertex buffer
-    bool depthTestEnabled = true;                         ///< Default depth test state
-    VkFormat colorFormat = VK_FORMAT_B8G8R8A8_SRGB;       ///< Color attachment format (default: sRGB)
-    VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;          ///< Depth attachment format (default: D32)
+    size_t initialVertexCapacity = 10000;            ///< Initial capacity for vertex buffer
+    bool depthTestEnabled = true;                    ///< Default depth test state
+    VkFormat colorFormat = VK_FORMAT_B8G8R8A8_SRGB;  ///< Color attachment format (default: sRGB)
+    VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;     ///< Depth attachment format (default: D32)
 };
 
 /// Debug rendering system for visualizing physics primitives
@@ -122,6 +122,15 @@ public:
     void drawSphere(const math::Vec3& center, float radius, const math::Vec4& color,
                     int segments = 16);
 
+    /// Draw a wireframe sphere with separate latitude and longitude control
+    /// @param center Sphere center (world space)
+    /// @param radius Sphere radius
+    /// @param color Sphere color (RGBA)
+    /// @param latSegments Number of latitude segments (horizontal rings, default 16)
+    /// @param lonSegments Number of longitude segments (vertical meridians, default 16)
+    void drawSphere(const math::Vec3& center, float radius, const math::Vec4& color,
+                    int latSegments, int lonSegments);
+
     /// Draw a wireframe capsule (cylinder with hemispherical caps)
     /// @param start Start point (center of first hemisphere)
     /// @param end End point (center of second hemisphere)
@@ -130,6 +139,16 @@ public:
     /// @param segments Number of segments around circumference (default 8)
     void drawCapsule(const math::Vec3& start, const math::Vec3& end, float radius,
                      const math::Vec4& color, int segments = 8);
+
+    /// Draw a wireframe capsule with separate segment and ring control
+    /// @param start Start point (center of first hemisphere)
+    /// @param end End point (center of second hemisphere)
+    /// @param radius Capsule radius
+    /// @param color Capsule color (RGBA)
+    /// @param segments Number of segments around circumference (default 8)
+    /// @param rings Number of rings on each hemisphere cap (default 4)
+    void drawCapsule(const math::Vec3& start, const math::Vec3& end, float radius,
+                     const math::Vec4& color, int segments, int rings);
 
     /// Draw a wireframe cone
     /// @param base Cone base center
@@ -155,6 +174,22 @@ public:
     /// @param color Plane color (RGBA)
     void drawPlane(const math::Vec3& center, const math::Vec3& normal, float size,
                    const math::Vec4& color);
+
+    /// Draw a convex hull from vertex and index data
+    /// @param vertices Vertex positions
+    /// @param indices Triangle indices (groups of 3)
+    /// @param color Hull color (RGBA)
+    void drawConvexHull(const std::vector<math::Vec3>& vertices,
+                        const std::vector<uint32_t>& indices, const math::Vec4& color);
+
+    /// Draw a convex hull with transformation
+    /// @param vertices Vertex positions (in local space)
+    /// @param indices Triangle indices (groups of 3)
+    /// @param transform Transform to apply to vertices
+    /// @param color Hull color (RGBA)
+    void drawConvexHull(const std::vector<math::Vec3>& vertices,
+                        const std::vector<uint32_t>& indices, const math::Transform& transform,
+                        const math::Vec4& color);
 
     /// Draw coordinate axes (X=red, Y=green, Z=blue)
     /// @param transform Transform defining coordinate system

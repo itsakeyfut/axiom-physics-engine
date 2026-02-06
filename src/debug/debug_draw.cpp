@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <set>
 
 namespace axiom::debug {
 
@@ -132,20 +133,28 @@ void DebugDraw::drawBox(const Transform& transform, const Vec3& halfExtents, con
 }
 
 void DebugDraw::drawSphere(const Vec3& center, float radius, const Vec4& color, int segments) {
-    if (segments < 4)
-        segments = 4;  // Minimum 4 segments
+    // Use same segments for both latitude and longitude
+    drawSphere(center, radius, color, segments, segments);
+}
+
+void DebugDraw::drawSphere(const Vec3& center, float radius, const Vec4& color, int latSegments,
+                           int lonSegments) {
+    if (latSegments < 4)
+        latSegments = 4;  // Minimum 4 latitude segments
+    if (lonSegments < 4)
+        lonSegments = 4;  // Minimum 4 longitude segments
 
     // Draw meridians (longitude lines)
-    for (int i = 0; i < segments; ++i) {
-        float angle = TWO_PI * static_cast<float>(i) / static_cast<float>(segments);
+    for (int i = 0; i < lonSegments; ++i) {
+        float angle = TWO_PI * static_cast<float>(i) / static_cast<float>(lonSegments);
 
         float cosA = std::cos(angle);
         float sinA = std::sin(angle);
 
         // Draw meridian (vertical circle)
-        for (int j = 0; j < segments; ++j) {
-            float theta = PI * static_cast<float>(j) / static_cast<float>(segments);
-            float nextTheta = PI * static_cast<float>(j + 1) / static_cast<float>(segments);
+        for (int j = 0; j < latSegments; ++j) {
+            float theta = PI * static_cast<float>(j) / static_cast<float>(latSegments);
+            float nextTheta = PI * static_cast<float>(j + 1) / static_cast<float>(latSegments);
 
             float sinT1 = std::sin(theta);
             float cosT1 = std::cos(theta);
@@ -160,16 +169,16 @@ void DebugDraw::drawSphere(const Vec3& center, float radius, const Vec4& color, 
     }
 
     // Draw parallels (latitude lines)
-    for (int j = 1; j < segments; ++j) {
-        float theta = PI * static_cast<float>(j) / static_cast<float>(segments);
+    for (int j = 1; j < latSegments; ++j) {
+        float theta = PI * static_cast<float>(j) / static_cast<float>(latSegments);
         float sinT = std::sin(theta);
         float cosT = std::cos(theta);
         float r = radius * sinT;
         float y = radius * cosT;
 
-        for (int i = 0; i < segments; ++i) {
-            float angle = TWO_PI * static_cast<float>(i) / static_cast<float>(segments);
-            float nextAngle = TWO_PI * static_cast<float>(i + 1) / static_cast<float>(segments);
+        for (int i = 0; i < lonSegments; ++i) {
+            float angle = TWO_PI * static_cast<float>(i) / static_cast<float>(lonSegments);
+            float nextAngle = TWO_PI * static_cast<float>(i + 1) / static_cast<float>(lonSegments);
 
             Vec3 p1 = center + Vec3(r * std::cos(angle), y, r * std::sin(angle));
             Vec3 p2 = center + Vec3(r * std::cos(nextAngle), y, r * std::sin(nextAngle));
@@ -181,8 +190,17 @@ void DebugDraw::drawSphere(const Vec3& center, float radius, const Vec4& color, 
 
 void DebugDraw::drawCapsule(const Vec3& start, const Vec3& end, float radius, const Vec4& color,
                             int segments) {
+    // Default to segments/2 rings for backward compatibility
+    int rings = std::max(2, segments / 2);
+    drawCapsule(start, end, radius, color, segments, rings);
+}
+
+void DebugDraw::drawCapsule(const Vec3& start, const Vec3& end, float radius, const Vec4& color,
+                            int segments, int rings) {
     if (segments < 4)
         segments = 4;
+    if (rings < 2)
+        rings = 2;
 
     // Calculate capsule axis
     Vec3 axis = end - start;
@@ -216,10 +234,9 @@ void DebugDraw::drawCapsule(const Vec3& start, const Vec3& end, float radius, co
         float nextAngle = TWO_PI * static_cast<float>(i + 1) / static_cast<float>(segments);
 
         // Draw rings on both hemispheres
-        for (int j = 0; j < segments / 2; ++j) {
-            float theta = PI * 0.5f * static_cast<float>(j) / static_cast<float>(segments / 2);
-            float nextTheta = PI * 0.5f * static_cast<float>(j + 1) /
-                              static_cast<float>(segments / 2);
+        for (int j = 0; j < rings; ++j) {
+            float theta = PI * 0.5f * static_cast<float>(j) / static_cast<float>(rings);
+            float nextTheta = PI * 0.5f * static_cast<float>(j + 1) / static_cast<float>(rings);
 
             float r1 = radius * std::cos(theta);
             float r2 = radius * std::cos(nextTheta);
@@ -370,6 +387,64 @@ void DebugDraw::drawGrid(const Vec3& center, float size, int divisions, const Ve
         Vec3 end = center + Vec3(x, 0, halfSize);
         addLine(start, end, color);
     }
+}
+
+void DebugDraw::drawConvexHull(const std::vector<Vec3>& vertices,
+                               const std::vector<uint32_t>& indices, const Vec4& color) {
+    // Draw edges of the convex hull
+    // Indices are assumed to be triangle indices (groups of 3)
+    // We extract unique edges from the triangles
+
+    if (indices.size() < 3 || vertices.empty()) {
+        return;  // Invalid hull
+    }
+
+    // Use a set to track unique edges (avoid duplicates)
+    // An edge is represented by two vertex indices (smaller index first)
+    std::set<std::pair<uint32_t, uint32_t>> edges;
+
+    // Extract edges from triangles
+    for (size_t i = 0; i + 2 < indices.size(); i += 3) {
+        uint32_t i0 = indices[i];
+        uint32_t i1 = indices[i + 1];
+        uint32_t i2 = indices[i + 2];
+
+        // Validate indices
+        if (i0 >= vertices.size() || i1 >= vertices.size() || i2 >= vertices.size()) {
+            continue;  // Skip invalid triangle
+        }
+
+        // Add the three edges of this triangle
+        edges.insert({std::min(i0, i1), std::max(i0, i1)});
+        edges.insert({std::min(i1, i2), std::max(i1, i2)});
+        edges.insert({std::min(i2, i0), std::max(i2, i0)});
+    }
+
+    // Draw all unique edges
+    for (const auto& edge : edges) {
+        const Vec3& v0 = vertices[edge.first];
+        const Vec3& v1 = vertices[edge.second];
+        addLine(v0, v1, color);
+    }
+}
+
+void DebugDraw::drawConvexHull(const std::vector<Vec3>& vertices,
+                               const std::vector<uint32_t>& indices, const Transform& transform,
+                               const Vec4& color) {
+    // Transform vertices and draw
+    if (indices.size() < 3 || vertices.empty()) {
+        return;  // Invalid hull
+    }
+
+    // Transform all vertices
+    std::vector<Vec3> transformedVertices;
+    transformedVertices.reserve(vertices.size());
+    for (const auto& v : vertices) {
+        transformedVertices.push_back(transform.transformPoint(v));
+    }
+
+    // Draw the transformed hull
+    drawConvexHull(transformedVertices, indices, color);
 }
 
 void DebugDraw::flush(VkCommandBuffer cmd, const Mat4& viewProj) {
