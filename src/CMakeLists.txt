@@ -14,6 +14,9 @@ add_subdirectory(debug)
 # Frontend module (Phase 2 - Window management)
 add_subdirectory(frontend)
 
+# GUI module (Phase 2 - ImGui integration)
+add_subdirectory(gui)
+
 # Application (main executable)
 add_subdirectory(app)
 
@@ -23,4 +26,4 @@ add_subdirectory(app)
 # add_subdirectory(softbody)
 # add_subdirectory(fluid)
 
-message(STATUS "Axiom modules configured: core, math, memory, gpu, debug, frontend")
+message(STATUS "Axiom modules configured: core, math, memory, gpu, debug, frontend, gui")
