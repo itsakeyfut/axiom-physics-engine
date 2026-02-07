@@ -175,7 +175,7 @@ bool PhysicsDebugPanel::renderSettingsSection(PhysicsWorldConfig& config) {
 
     // Display equivalent FPS
     float fps = 1.0f / config.timeStep;
-    ImGui::Text("(%.1f FPS)", fps);
+    ImGui::Text("(%.1f FPS)", static_cast<double>(fps));
 
     ImGui::Spacing();
 
@@ -300,11 +300,11 @@ void PhysicsDebugPanel::renderPerformanceSection(const PhysicsWorldStats& stats)
     ImGui::Indent();
 
     // Total step time
-    ImGui::Text("Total Step Time: %.2f ms", stats.totalStepTime);
+    ImGui::Text("Total Step Time: %.2f ms", static_cast<double>(stats.totalStepTime));
 
     // Show FPS
     float fps = (stats.totalStepTime > 0.0f) ? (1000.0f / stats.totalStepTime) : 0.0f;
-    ImGui::Text("Physics FPS: %.1f", fps);
+    ImGui::Text("Physics FPS: %.1f", static_cast<double>(fps));
 
     ImGui::Spacing();
     ImGui::Separator();
@@ -312,10 +312,10 @@ void PhysicsDebugPanel::renderPerformanceSection(const PhysicsWorldStats& stats)
 
     // Time breakdown
     ImGui::Indent();
-    ImGui::Text("Broadphase:   %.2f ms", stats.broadphaseTime);
-    ImGui::Text("Narrowphase:  %.2f ms", stats.narrowphaseTime);
-    ImGui::Text("Solver:       %.2f ms", stats.solverTime);
-    ImGui::Text("Integration:  %.2f ms", stats.integrationTime);
+    ImGui::Text("Broadphase:   %.2f ms", static_cast<double>(stats.broadphaseTime));
+    ImGui::Text("Narrowphase:  %.2f ms", static_cast<double>(stats.narrowphaseTime));
+    ImGui::Text("Solver:       %.2f ms", static_cast<double>(stats.solverTime));
+    ImGui::Text("Integration:  %.2f ms", static_cast<double>(stats.integrationTime));
     ImGui::Unindent();
 
     ImGui::Spacing();
@@ -332,19 +332,19 @@ void PhysicsDebugPanel::renderPerformanceSection(const PhysicsWorldStats& stats)
 
         ImGui::ProgressBar(broadphasePercent, ImVec2(-1, 0), "");
         ImGui::SameLine(0, 5);
-        ImGui::Text("Broadphase (%.1f%%)", broadphasePercent * 100.0f);
+        ImGui::Text("Broadphase (%.1f%%)", static_cast<double>(broadphasePercent * 100.0f));
 
         ImGui::ProgressBar(narrowphasePercent, ImVec2(-1, 0), "");
         ImGui::SameLine(0, 5);
-        ImGui::Text("Narrowphase (%.1f%%)", narrowphasePercent * 100.0f);
+        ImGui::Text("Narrowphase (%.1f%%)", static_cast<double>(narrowphasePercent * 100.0f));
 
         ImGui::ProgressBar(solverPercent, ImVec2(-1, 0), "");
         ImGui::SameLine(0, 5);
-        ImGui::Text("Solver (%.1f%%)", solverPercent * 100.0f);
+        ImGui::Text("Solver (%.1f%%)", static_cast<double>(solverPercent * 100.0f));
 
         ImGui::ProgressBar(integrationPercent, ImVec2(-1, 0), "");
         ImGui::SameLine(0, 5);
-        ImGui::Text("Integration (%.1f%%)", integrationPercent * 100.0f);
+        ImGui::Text("Integration (%.1f%%)", static_cast<double>(integrationPercent * 100.0f));
     }
 
     ImGui::Unindent();
