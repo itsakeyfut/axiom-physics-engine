@@ -33,7 +33,7 @@ struct MockPhysicsWorld {
         time += dt;
 
         stats.totalBodies = 50 + static_cast<uint32_t>(std::sin(time * 0.5f) * 20.0f);
-        stats.activeBodies = static_cast<uint32_t>(stats.totalBodies * 0.8f);
+        stats.activeBodies = static_cast<uint32_t>(static_cast<float>(stats.totalBodies) * 0.8f);
         stats.sleepingBodies = stats.totalBodies - stats.activeBodies;
         stats.staticBodies = 10;
         stats.dynamicBodies = stats.totalBodies - stats.staticBodies;
@@ -57,7 +57,8 @@ struct MockPhysicsWorld {
     void applyConfig(const gui::PhysicsWorldConfig& newConfig) {
         config = newConfig;
         AXIOM_LOG_INFO("PhysicsPanel", "Configuration updated: gravity=(%.2f, %.2f, %.2f)",
-                       config.gravity.x, config.gravity.y, config.gravity.z);
+                       static_cast<double>(config.gravity.x), static_cast<double>(config.gravity.y),
+                       static_cast<double>(config.gravity.z));
     }
 
     void applyDebugFlags(debug::PhysicsDebugFlags newFlags) {
@@ -149,8 +150,8 @@ int main() {
         ImGui::Text("This example demonstrates the PhysicsDebugPanel");
         ImGui::Text("with a mock physics simulation.");
         ImGui::Spacing();
-        ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-        ImGui::Text("Frame Time: %.2f ms", deltaTime * 1000.0f);
+        ImGui::Text("FPS: %.1f", static_cast<double>(ImGui::GetIO().Framerate));
+        ImGui::Text("Frame Time: %.2f ms", static_cast<double>(deltaTime * 1000.0f));
         ImGui::Spacing();
         ImGui::Text("Instructions:");
         ImGui::BulletText("Adjust simulation settings in the panel");
