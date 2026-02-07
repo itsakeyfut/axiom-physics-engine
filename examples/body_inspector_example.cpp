@@ -254,7 +254,7 @@ int main() {
 
         // Render body inspector for selected body
         if (selectedBodyIndex >= 0 && selectedBodyIndex < static_cast<int>(bodies.size())) {
-            auto& selectedBody = bodies[selectedBodyIndex];
+            auto& selectedBody = bodies[static_cast<size_t>(selectedBodyIndex)];
 
             // Create window title with body name
             char windowTitle[256];
