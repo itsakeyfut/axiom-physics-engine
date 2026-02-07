@@ -6,6 +6,7 @@ find_package(imgui CONFIG REQUIRED)
 # Source files
 set(GUI_SOURCES
     imgui_impl.cpp
+    physics_panel.cpp
 )
 
 # Create GUI library
@@ -23,6 +24,7 @@ target_include_directories(axiom_gui
 target_link_libraries(axiom_gui
     PUBLIC
         axiom::core
+        axiom::debug
         axiom::gpu
         axiom::frontend
         Vulkan::Vulkan
