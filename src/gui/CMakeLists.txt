@@ -7,6 +7,7 @@ find_package(imgui CONFIG REQUIRED)
 set(GUI_SOURCES
     imgui_impl.cpp
     physics_panel.cpp
+    body_inspector.cpp
 )
 
 # Create GUI library
