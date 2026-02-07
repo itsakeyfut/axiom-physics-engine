@@ -40,6 +40,7 @@ add_executable(axiom_tests
     frontend/window_test.cpp
     gui/imgui_renderer_test.cpp
     gui/physics_panel_test.cpp
+    gui/body_inspector_test.cpp
 )
 
 # Link libraries

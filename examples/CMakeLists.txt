@@ -66,4 +66,23 @@ set_target_properties(physics_panel_example PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
-message(STATUS "Examples configured: profiling_example, vk_test, command_buffer_example, physics_panel_example")
+# Body inspector example - demonstrates body inspector with ImGui
+add_executable(body_inspector_example
+    body_inspector_example.cpp
+)
+
+target_link_libraries(body_inspector_example
+    PRIVATE
+        axiom::core
+        axiom::gui
+        axiom::frontend
+        axiom::gpu
+        axiom::math
+        glfw
+)
+
+set_target_properties(body_inspector_example PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
+message(STATUS "Examples configured: profiling_example, vk_test, command_buffer_example, physics_panel_example, body_inspector_example")
