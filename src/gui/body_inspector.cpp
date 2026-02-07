@@ -4,6 +4,7 @@
 #include "axiom/math/utils.hpp"
 
 #include <cmath>
+#include <cstring>
 #include <imgui.h>
 
 namespace axiom::gui {
@@ -62,40 +63,6 @@ math::Quat eulerToQuat(const math::Vec3& euler) {
     q.z = cr * cp * sy - sr * sp * cy;
 
     return q;
-}
-
-// Helper to get body type name
-const char* getBodyTypeName(BodyType type) {
-    switch (type) {
-    case BodyType::Static:
-        return "Static";
-    case BodyType::Dynamic:
-        return "Dynamic";
-    case BodyType::Kinematic:
-        return "Kinematic";
-    default:
-        return "Unknown";
-    }
-}
-
-// Helper to get shape type name
-const char* getShapeTypeName(ShapeType type) {
-    switch (type) {
-    case ShapeType::Sphere:
-        return "Sphere";
-    case ShapeType::Box:
-        return "Box";
-    case ShapeType::Capsule:
-        return "Capsule";
-    case ShapeType::Cylinder:
-        return "Cylinder";
-    case ShapeType::Mesh:
-        return "Mesh";
-    case ShapeType::Convex:
-        return "Convex";
-    default:
-        return "Unknown";
-    }
 }
 
 }  // namespace
@@ -198,7 +165,7 @@ bool BodyInspector::renderIdentitySection(RigidBodyData& bodyData) {
 
     // Name (editable text)
     char nameBuffer[256];
-    std::strncpy(nameBuffer, bodyData.name.c_str(), sizeof(nameBuffer) - 1);
+    strncpy(nameBuffer, bodyData.name.c_str(), sizeof(nameBuffer) - 1);
     nameBuffer[sizeof(nameBuffer) - 1] = '\0';
 
     if (ImGui::InputText("Name", nameBuffer, sizeof(nameBuffer))) {
